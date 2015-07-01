@@ -1,0 +1,4 @@
+[package]
+name = "rustsci"
+version = "0.1.0"
+authors = ["Pedro Rittner <pedro.rittner@outlook.com>"]
