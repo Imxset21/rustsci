@@ -74,6 +74,11 @@ impl<T: Add + Sub + Copy + PartialEq> PartialEq for Array<T>
 {
     fn eq(&self, other: &Array<T>) -> bool
     {
+        if self.my_vec.len() != other.my_vec.len()
+        {
+            panic!("Cannot compare arrays of different dimensions.")
+        }
+        
         for (num1, num2) in self.my_vec.iter().zip(other.my_vec.iter())
         {
             if *num1 != *num2
