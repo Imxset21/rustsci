@@ -5,8 +5,8 @@ use std::ops::Sub;
 use std::cmp::PartialEq;
 
 /// Enumerator for whether the vector is horizontal or vertical
-#[derive(Debug, PartialEq)]
 #[allow(dead_code)]
+#[derive(Debug, PartialEq)]
 pub enum Order { Column, Row}
 
 #[derive(Debug)]
@@ -22,6 +22,7 @@ pub struct Array<T> where T: Add + Sub + Copy + PartialEq
 impl<T> Array<T> where T: Add + Sub + Copy + PartialEq
 {
     /// A public constructor
+    #[allow(dead_code)]
     pub fn new(contents: Vec<T>, order: Order) -> Array<T>
     {
         Array
