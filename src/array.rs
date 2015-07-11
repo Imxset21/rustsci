@@ -1,7 +1,8 @@
 // Array type
 
-use std::ops::Add;
-use std::ops::Sub;
+use common::Transposable;
+
+use std::ops::{Add, Sub};
 use std::cmp::PartialEq;
 
 /// Enumerator for whether the vector is horizontal or vertical
@@ -31,6 +32,23 @@ impl<T> Array<T> where T: Add + Sub + Copy + PartialEq
             my_vec: contents,
             order: order
         }
+    }
+}
+
+impl<T> Transposable for Array<T>
+    where T: Add<Output=T> + Sub + Copy + PartialEq
+{
+    fn transpose(self) -> Array<T>
+    {
+        let mut order = self.order;
+        if order == Order::Column
+        {
+            order = Order::Row;
+        } else {
+            order = Order::Column;
+        }
+
+        Array {my_vec: self.my_vec, order: order}
     }
 }
 

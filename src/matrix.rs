@@ -1,8 +1,11 @@
 // Matrix type
+// #![feature(step_by)]
+// mod common;
+use common::Transposable;
 
-use std::ops::Add;
-use std::ops::Sub;
+use std::ops::{Add, Sub};
 use std::cmp::PartialEq;
+
 
 /// Regular ol' matrix. No sparseness or any of that garbage, that's for later.
 #[derive(Debug)]
@@ -47,6 +50,33 @@ fn validate_contents<T>(contents: &Vec<Vec<T>>) -> bool
             }
         }
         return true;
+    }
+}
+
+/// Allows for matrix transposing
+impl<T> Transposable for Matrix<T> where T: Add + Sub + Copy + PartialEq
+{
+    fn transpose(self) -> Matrix<T>
+    {
+        let mut new_vec = Vec::<T>::with_capacity(self.my_dat.len());
+        let new_rows = self.num_cols;
+        let new_cols = self.num_rows;
+
+        for i in (0..new_rows)
+        {
+            for new_indx in (i..new_vec.len()).step_by(new_rows)
+            {
+                new_vec.push(self.my_dat[new_indx])
+            }
+        }
+
+        Matrix
+        {
+            my_dat: new_vec,
+            col_ordering: true,
+            num_rows: new_rows,
+            num_cols: new_cols,
+        }
     }
 }
 
@@ -156,7 +186,7 @@ impl<T> Sub for Matrix<T> where T: Add + Sub<Output=T> + Copy + PartialEq
     }
 }
 
-
+/// Implementation of partial equality testing
 impl<T> PartialEq for Matrix<T> where T: Add<Output=T> + Sub + Copy + PartialEq
 {
     fn eq(&self, other: &Matrix<T>) -> bool

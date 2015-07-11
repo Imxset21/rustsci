@@ -1,11 +1,15 @@
+#![feature(step_by)]
+
 mod array;
 mod matrix;
+mod common;
 
 #[cfg(test)]
 mod test
 {
     use array;
     use matrix;
+    use common::Transposable;
     use std::mem;
 
     #[test]
@@ -13,7 +17,7 @@ mod test
     {
         let a = array::Array::<i32>::new(vec![1, 2, 3], array::Order::Row);
         let b = array::Array::<i32>::new(vec![1, 2, 3], array::Order::Row);
-        assert!(a == b);
+        assert_eq!(a, b);
     }
     
     #[test]
@@ -22,7 +26,7 @@ mod test
         let a = array::Array::<i32>::new(vec![1, 2, 3], array::Order::Row);
         let b = array::Array::<i32>::new(vec![4, 5, 6], array::Order::Row);
         let c = array::Array::<i32>::new(vec![3, 3, 3], array::Order::Row);
-        assert!(b - a == c);
+        assert_eq!(b - a, c);
     }
 
     #[test]
@@ -31,7 +35,7 @@ mod test
         let a = array::Array::<i32>::new(vec![1, 2, 3], array::Order::Row);
         let b = array::Array::<i32>::new(vec![4, 5, 6], array::Order::Row);
         let c = array::Array::<i32>::new(vec![5, 7, 9], array::Order::Row);
-        assert!(a + b == c);
+        assert_eq!(a + b, c);
     }
 
     #[test]
@@ -39,7 +43,7 @@ mod test
     {
         let a = array::Array::<i32>::new(vec![0; 100], array::Order::Row);
         let b = array::Array::<i32>::new(vec![4, 5, 6], array::Order::Row);
-        assert!(mem::size_of_val(&a) == mem::size_of_val(&b));
+        assert_eq!(mem::size_of_val(&a), mem::size_of_val(&b));
     }
 
     #[test]
@@ -48,7 +52,7 @@ mod test
         let a = matrix::Matrix::<i32>::new(vec![vec![1, 2], vec![3, 4]]);
         let b = matrix::Matrix::<i32>::new(vec![vec![5, 6], vec![7, 8]]);
         let c = matrix::Matrix::<i32>::new(vec![vec![6, 8], vec![10, 12]]);
-        assert!(a + b == c);
+        assert_eq!(a + b, c);
     }
 
     #[test]
@@ -57,7 +61,7 @@ mod test
         let a = matrix::Matrix::<i32>::new(vec![vec![1, 2], vec![3, 4]]);
         let b = matrix::Matrix::<i32>::new(vec![vec![5, 6], vec![7, 8]]);
         let c = matrix::Matrix::<i32>::new(vec![vec![-4, -4], vec![-4, -4]]);
-        assert!(a - b == c);
+        assert_eq!(a - b, c);
     }
 
     #[test]
@@ -65,7 +69,7 @@ mod test
     {
         let a = matrix::Matrix::<i32>::new(vec![vec![1, 2, 3], vec![3, 4, 5]]);
         let b = matrix::Matrix::<i32>::new(vec![vec![1, 2, 3], vec![3, 4, 5]]);
-        assert!(a == b);
+        assert_eq!(a, b);
     }
 
     #[test]
@@ -84,5 +88,21 @@ mod test
         let b = matrix::Matrix::<i32>::new(vec![vec![1, 2, 3], vec![3, 4, 5]]);
         let result = a + b;
         assert!(result == result);  // Unreachable
+    }
+
+    #[test]
+    fn test_mat_t_2x2()
+    {
+        let a = matrix::Matrix::<i32>::new(vec![vec![1, 2], vec![3, 4]]);
+        let a_t = matrix::Matrix::<i32>::new(vec![vec![1, 3], vec![2, 4]]);
+        assert_eq!(a_t, a.transpose())
+    }
+
+    #[test]
+    fn test_mat_t_2x3()
+    {
+        let a = matrix::Matrix::<i32>::new(vec![vec![1, 2, 3], vec![3, 4, 5]]);
+        let b = matrix::Matrix::<i32>::new(vec![vec![1,3], vec![2, 4], vec![3, 5]]);
+        assert_eq!(b, a.transpose());
     }
 }
