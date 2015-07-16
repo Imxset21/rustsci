@@ -1,9 +1,11 @@
 // Matrix type
-// #![feature(step_by)]
-// mod common;
+
+// #![feature(step_by)]  // <- Uncomment for static analysis tools
+// mod common;  // <- Uncomment for static analysis tools
+
 use common::Transposable;
 
-use std::ops::{Add, Sub};
+use std::ops::{Add, Sub, Index, IndexMut};
 use std::cmp::PartialEq;
 
 
@@ -25,7 +27,7 @@ fn get_content_dims<T>(contents: &Vec<Vec<T>>) -> (usize, usize)
     let num_rows = contents.len();
     if num_rows == 0
     {
-        return (0, 0)
+        return (0, 0);
     } else {
         return (num_rows, contents[0].len());
     }
@@ -191,7 +193,7 @@ impl<T> PartialEq for Matrix<T> where T: Add<Output=T> + Sub + Copy + PartialEq
 {
     fn eq(&self, other: &Matrix<T>) -> bool
     {
-        // Using fold, though idiomatic, has average case of O(n)
+        // Using fold, though idiomatic, has average case of O(n).
         // Here we choose to use the standard for loop since avg. is O(log n)
         for (val1, val2) in self.my_dat.iter().zip(other.my_dat.iter())
         {
@@ -202,5 +204,119 @@ impl<T> PartialEq for Matrix<T> where T: Add<Output=T> + Sub + Copy + PartialEq
         }
 
         return true;
+    }
+}
+
+/// Primary implementation of public methods for generic matrices
+impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
+{
+    /// Returns true if-and-only-if the matrix is square.
+    #[allow(dead_code)]
+    pub fn is_square(&self) -> bool
+    {
+        self.num_rows == self.num_cols
+    }
+
+    /// Zero-out upper trigonal "corner" of the matrix with the given "zero" value
+    #[allow(dead_code)]
+    pub fn zero_trigonal_upper(mat: &mut Matrix<T>, zero_val: T)
+    {
+        if !Matrix::<T>::is_square(mat)
+        {
+            panic!("Matrix must be square.");
+        }
+        let n = mat.num_rows;
+        for i in (0..n)
+        {
+            for j in (0..n)
+            {
+                if i > j
+                {
+                    mat.my_dat[j * n + i] = zero_val;
+                }
+            }
+        }
+    }
+
+    /// Zero-out lower trigonal "corner" of the matrix with the given "zero" value
+    #[allow(dead_code)]
+    pub fn zero_trigonal_lower(mat: &mut Matrix<T>, zero_val: T)
+    {
+        if !Matrix::<T>::is_square(mat)
+        {
+            panic!("Matrix must be square.");
+        }
+        let n = mat.num_rows;
+        for i in (0..n)
+        {
+            for j in (0..n)
+            {
+                if i < j
+                {
+                    mat.my_dat[j * n + i] = zero_val;
+                }
+            }
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn get(&self, i: usize, j: usize) -> &T
+    {
+        if i > self.num_rows || j > self.num_cols
+        {
+            panic!("Index out of bounds.");
+        }
+
+        return &self.my_dat[i * self.num_rows + j]
+    }
+
+    #[allow(dead_code)]
+    pub fn set(&mut self, i: usize, j: usize, val: T)
+    {
+        if i > self.num_rows || j > self.num_cols
+        {
+            panic!("Indices out of bounds.");
+        }
+
+        self.my_dat[i * self.num_rows + j] = val;
+    }
+}
+
+impl <T> Index<(usize, usize)> for Matrix<T>
+    where T: Add + Sub + Copy + PartialEq
+{
+    type Output = T;
+
+    fn index<'a>(&'a self, indices: (usize, usize)) -> &'a T
+    {
+        let (i, j) = indices;
+        return self.get(i, j);
+    }
+}
+
+impl <T> IndexMut<(usize, usize)> for Matrix<T>
+    where T: Add + Sub + Copy + PartialEq
+{
+    fn index_mut<'a>(&'a mut self, indices: (usize, usize)) -> &'a mut T
+    {
+        let (i, j) = indices;
+        if i > self.num_rows || j > self.num_cols
+        {
+            panic!("Indices out of bounds.");
+        }
+        return &mut self.my_dat[i * self.num_rows + j];
+    }
+}
+
+
+/// Convenience macro for creating matrices
+macro_rules! mat
+{
+    (
+        $(
+            [ $( $x:expr ),* ]
+        ),*
+    ) => {
+        matrix::Matrix::new(vec![ $( vec![$( $x ),*]),*])
     }
 }

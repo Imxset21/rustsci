@@ -1,8 +1,10 @@
 // Array type
 
+// mod common;  // <- Uncomment for static analysis tools
+
 use common::Transposable;
 
-use std::ops::{Add, Sub};
+use std::ops::{Add, Sub, Index, IndexMut};
 use std::cmp::PartialEq;
 
 /// Enumerator for whether the vector is horizontal or vertical
@@ -136,4 +138,46 @@ impl<T> PartialEq for Array<T> where T: Add + Sub + Copy + PartialEq
 
         return true
     }
+}
+
+impl <T> Index<usize> for Array<T>
+    where T: Add + Sub + Copy + PartialEq
+{
+    type Output = T;
+
+    fn index<'a>(&'a self, index: usize) -> &'a T
+    {
+        if index > self.my_vec.len()
+        {
+            panic!("Index out of bounds.");
+        }
+        return &self.my_vec[index];
+    }
+}
+
+impl <T> IndexMut<usize> for Array<T>
+    where T: Add + Sub + Copy + PartialEq
+{
+    fn index_mut<'a>(&'a mut self, index: usize) -> &'a mut T
+    {
+        if index > self.my_vec.len()
+        {
+            panic!("Index out of bounds.");
+        }
+        return &mut self.my_vec[index];
+    }
+}
+
+macro_rules! arr
+{
+    ( $( $x:expr ),* ) =>
+    {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+                )*
+                array::Array::new(temp_vec, array::Order::Row)
+        }
+    };
 }
