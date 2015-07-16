@@ -1,18 +1,22 @@
 #![feature(step_by)]
+#![feature(libc)]
+#![allow(dead_code)]
+
+extern crate libc;
 
 #[macro_use] mod array;
 #[macro_use] mod matrix;
 mod common;
+mod lapacke;
 
 #[cfg(test)]
 mod test
 {
     use array;
     use matrix;
+    use lapacke;
     use common::Transposable;
     use std::mem;
-
-
 
     #[test]
     fn test_arr_eq()
@@ -185,5 +189,18 @@ mod test
                                                 vec![4, 5, 6],
                                                 vec![7, 8, 9]]);
         assert_eq!(*b.get(1, 1), 5);
+    }
+
+    #[test]
+    fn test_mat_cholesky()
+    {
+        let mut m = mat![[25., 15., -5.],
+                         [15., 18., 0.],
+                         [-5., 0., 11.]];
+        let result = mat![[5., 3., -1.],
+                          [0., 3., 1.],
+                          [0., 0., 3.]];
+        lapacke::cholesky_decomposition(&mut m);
+        assert_eq!(m, result);
     }
 }

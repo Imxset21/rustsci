@@ -20,7 +20,6 @@ pub struct Matrix<T> where T: Add + Sub + Copy + PartialEq
 }
 
 /// Private (?) helper function
-#[allow(dead_code)]
 fn get_content_dims<T>(contents: &Vec<Vec<T>>) -> (usize, usize)
     where T: Add + Sub + Copy + PartialEq
 {
@@ -34,7 +33,6 @@ fn get_content_dims<T>(contents: &Vec<Vec<T>>) -> (usize, usize)
 }
 
 /// Validates whether a vector of vectors is consistent
-#[allow(dead_code)]
 fn validate_contents<T>(contents: &Vec<Vec<T>>) -> bool
     where T: Add + Sub + Copy + PartialEq
 {
@@ -84,7 +82,6 @@ impl<T> Transposable for Matrix<T> where T: Add + Sub + Copy + PartialEq
 
 impl<T> Matrix<T> where T: Add + Sub + Copy + PartialEq
 {
-    #[allow(dead_code)]
     pub fn new(contents: Vec<Vec<T>>) -> Matrix<T>
     {
         if !validate_contents(&contents)
@@ -211,55 +208,52 @@ impl<T> PartialEq for Matrix<T> where T: Add<Output=T> + Sub + Copy + PartialEq
 impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
 {
     /// Returns true if-and-only-if the matrix is square.
-    #[allow(dead_code)]
     pub fn is_square(&self) -> bool
     {
         self.num_rows == self.num_cols
     }
 
     /// Zero-out upper trigonal "corner" of the matrix with the given "zero" value
-    #[allow(dead_code)]
-    pub fn zero_trigonal_upper(mat: &mut Matrix<T>, zero_val: T)
+    pub fn zero_trigonal_upper(&mut self, zero_val: T)
     {
-        if !Matrix::<T>::is_square(mat)
+        if !self.is_square()
         {
             panic!("Matrix must be square.");
         }
-        let n = mat.num_rows;
+        let n = self.num_rows;
         for i in (0..n)
         {
             for j in (0..n)
             {
                 if i > j
                 {
-                    mat.my_dat[j * n + i] = zero_val;
+                    self.my_dat[j * n + i] = zero_val;
                 }
             }
         }
     }
 
     /// Zero-out lower trigonal "corner" of the matrix with the given "zero" value
-    #[allow(dead_code)]
-    pub fn zero_trigonal_lower(mat: &mut Matrix<T>, zero_val: T)
+    pub fn zero_trigonal_lower(&mut self, zero_val: T)
     {
-        if !Matrix::<T>::is_square(mat)
+        if !self.is_square()
         {
             panic!("Matrix must be square.");
         }
-        let n = mat.num_rows;
+        let n = self.num_rows;
         for i in (0..n)
         {
             for j in (0..n)
             {
                 if i < j
                 {
-                    mat.my_dat[j * n + i] = zero_val;
+                    self.my_dat[j * n + i] = zero_val;
                 }
             }
         }
     }
 
-    #[allow(dead_code)]
+    /// Gets a reference to the value at the matrix's index coordinates
     pub fn get(&self, i: usize, j: usize) -> &T
     {
         if i > self.num_rows || j > self.num_cols
@@ -270,7 +264,7 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
         return &self.my_dat[i * self.num_rows + j]
     }
 
-    #[allow(dead_code)]
+    /// Sets the value at the matrix's index coordinates
     pub fn set(&mut self, i: usize, j: usize, val: T)
     {
         if i > self.num_rows || j > self.num_cols
@@ -279,6 +273,24 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
         }
 
         self.my_dat[i * self.num_rows + j] = val;
+    }
+
+    /// Gets the dimension of the matrix as a tuple (num_rows, num_cols)
+    pub fn get_dims(&self) -> (usize, usize)
+    {
+        (self.num_rows, self.num_cols)
+    }
+
+    /// Gets the underlying matrix data as a raw pointer
+    pub unsafe fn as_ptr(&self) -> *const T
+    {
+        self.my_dat.as_ptr()
+    }
+
+    /// Gets the underlying matrix data as a mutable pointer
+    pub unsafe fn as_mut_ptr(&mut self) -> *mut T
+    {
+        self.my_dat.as_mut_ptr()
     }
 }
 
@@ -309,7 +321,7 @@ impl <T> IndexMut<(usize, usize)> for Matrix<T>
 }
 
 
-/// Convenience macro for creating matrices
+/// Convenience macro for creating matrices, like vec!
 macro_rules! mat
 {
     (
