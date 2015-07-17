@@ -4,11 +4,10 @@
 
 use common::Transposable;
 
-use std::ops::{Add, Sub, Index, IndexMut};
+use std::ops::{Add, Sub, Index, IndexMut, Mul};
 use std::cmp::PartialEq;
 
 /// Enumerator for whether the vector is horizontal or vertical
-#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum Order { Column, Row}
 
@@ -25,7 +24,6 @@ pub struct Array<T> where T: Add + Sub + Copy + PartialEq
 impl<T> Array<T> where T: Add + Sub + Copy + PartialEq
 {
     /// A public constructor
-    #[allow(dead_code)]
     pub fn new(contents: Vec<T>, order: Order) -> Array<T>
     {
         Array
@@ -116,7 +114,7 @@ impl<T> Sub for Array<T> where T: Add + Sub<Output=T> + Copy + PartialEq
     }
 }
 
-/// Implementation of the PartialEq trait
+/// Implementation of the PartialEq trait, allowing for a = b, a != b
 impl<T> PartialEq for Array<T> where T: Add + Sub + Copy + PartialEq
 {
     fn eq(&self, other: &Array<T>) -> bool
@@ -140,6 +138,7 @@ impl<T> PartialEq for Array<T> where T: Add + Sub + Copy + PartialEq
     }
 }
 
+/// Enables getting an array value via index, e.g. a[0]
 impl <T> Index<usize> for Array<T>
     where T: Add + Sub + Copy + PartialEq
 {
@@ -155,6 +154,7 @@ impl <T> Index<usize> for Array<T>
     }
 }
 
+/// Enables things like a[0] = 3, where a is an Array
 impl <T> IndexMut<usize> for Array<T>
     where T: Add + Sub + Copy + PartialEq
 {
@@ -168,6 +168,46 @@ impl <T> IndexMut<usize> for Array<T>
     }
 }
 
+/// Implements the multiplication trait as a dot product
+impl <T> Mul for Array<T>
+    where T: Add<Output=T> + Sub + Copy + PartialEq + Mul<Output=T>
+{
+    type Output = T;
+
+    fn mul(self, _rhs: Array<T>) -> T
+    {
+        if self.my_vec.len() != _rhs.my_vec.len()
+        {
+            panic!("Cannot dot product different-length arrays.")
+        }
+        
+        // let sum : Option<T> = None;
+        // for (a_i, b_i) in self.my_vec.into_iter().zip(_rhs.my_vec.into_iter())
+        // {
+        //     sum = match sum {
+        //         None => Some(a_i * b_i),
+        //         Some(sum_val) => Some(sum_val + (a_i * b_i))
+        //     };
+        // }
+
+        let sum: Option<T> =
+            self.my_vec.into_iter().zip(_rhs.my_vec.into_iter()).fold(
+                None,
+                |sum_val, (a_i, b_i)| match sum_val {
+                    None => Some(a_i * b_i),
+                    Some(curr_val) => Some(curr_val + (a_i * b_i))
+                }
+            );
+        
+        // Return value
+        match sum {
+            Some(sum_val) => sum_val,
+            None => panic!("Unable to calculate dot product")
+        }
+    }
+}
+
+/// Convenience macro for creating arrays in a vec!-like way
 macro_rules! arr
 {
     ( $( $x:expr ),* ) =>

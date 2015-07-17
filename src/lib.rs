@@ -203,4 +203,13 @@ mod test
         lapacke::cholesky_decomposition(&mut m);
         assert_eq!(m, result);
     }
+
+    #[test]
+    fn test_arr_dot_product_generic()
+    {
+        let a = arr![1, 2, 3];
+        let b = arr![4, 5, 6];
+        assert_eq!(32, a * b);
+    }
 }
+
