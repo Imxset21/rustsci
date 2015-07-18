@@ -346,28 +346,14 @@ impl <T> Mul for Matrix<T>
             for j in (0..p)
             {
                 // AB[(i, j)] = ...
-                // let sum : Option<T> = (0..m-1).fold(
-                //     None,
-                //     |sum_val, k| match sum_val {
-                //         None => Some(self[(i, k)] * _rhs[(k, j)]),
-                //         Some(curr_val) => Some(curr_val + (self[(i, k)] * _rhs[(k, j)]))
-                //     }
-                //     );
-                let mut sum : Option<T> = None;
-
-                for k in (0..m)
-                {
-                    sum = match sum
-                    {
-                        // No value yet, assume first value
+                let sum : Option<T> = (0..m).fold(
+                    None,
+                    |sum_val, k| match sum_val {
                         None => Some(self[(i, k)] * _rhs[(k, j)]),
-                        Some(curr_val) => Some(self[(i, k)] * _rhs[(k, j)] + curr_val)
-                    };
-                    println!("k, sum: {}, {:?}", k, sum);
-                }
+                        Some(curr_val) => Some(curr_val + (self[(i, k)] * _rhs[(k, j)]))
+                    }
+                    );
                 
-                println!("i, j, sum: {}, {}, {:?}", i, j, sum);
-
                 match sum {
                     Some(sum_val) => curr_col.push(sum_val),
                     None => panic!("Error computing matrix product")
