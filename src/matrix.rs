@@ -7,7 +7,6 @@ use common::Transposable;
 
 use std::ops::{Add, Sub, Index, IndexMut, Mul};
 use std::cmp::PartialEq;
-use std::fmt::Debug;
 
 /// Regular ol' matrix. No sparseness or any of that garbage, that's for later.
 #[derive(Debug)]
@@ -322,7 +321,7 @@ impl <T> IndexMut<(usize, usize)> for Matrix<T>
 
 /// Naive matrix product
 impl <T> Mul for Matrix<T>
-    where T: Add<Output=T> + Sub + Copy + PartialEq + Mul<Output=T> + Debug
+    where T: Add<Output=T> + Sub + Copy + PartialEq + Mul<Output=T>
 {
     type Output = Matrix<T>;
 

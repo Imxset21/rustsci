@@ -7,6 +7,7 @@ extern crate libc;
 #[macro_use] pub mod array;
 #[macro_use] pub mod matrix;
 pub mod lapacke;
+pub mod openblas;
 mod common;
 
 #[cfg(test)]
@@ -15,6 +16,7 @@ mod test
     use array;
     use matrix;
     use lapacke;
+    use openblas;
     use common::Transposable;
     use std::mem;
 
@@ -235,6 +237,16 @@ mod test
         let m3 = mat![[58, 64],
                       [139, 154]];
         assert_eq!(m3, m1 * m2);
+    }
+
+    #[test]
+    fn test_openblas_ddot()
+    {
+        let a1 = arr![1., 2., 3.];
+        let a2 = arr![4., 5., 6.];
+        let blas_result = openblas::openblas_ddot(&a1, &a2);
+        let gen_result = a1 * a2;  // Generic dot product
+        assert_eq!(gen_result, blas_result);
     }
 }
 

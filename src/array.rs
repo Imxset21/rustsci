@@ -68,6 +68,7 @@ impl<T> Add for Array<T> where T: Add<Output=T> + Sub + Copy + PartialEq
             return Array { my_vec: vec![], order: self.order }
         }
 
+        #[inline]
         fn add_two<'a, T>((a, b) : (&'a T, &'a T),) -> T
             where T: Add<Output=T> + Sub + Copy + PartialEq
         {
@@ -204,6 +205,27 @@ impl <T> Mul for Array<T>
             Some(sum_val) => sum_val,
             None => panic!("Unable to calculate dot product")
         }
+    }
+}
+
+impl <T> Array<T> where T: Add + Sub + PartialEq + Copy
+{
+    /// Gets array contents as raw pointer
+    pub unsafe fn as_ptr(&self) -> *const T
+    {
+        self.my_vec.as_ptr()
+    }
+
+    /// Gets array contents as a mutable pointer
+    pub unsafe fn as_mut_ptr(&mut self) -> *mut T
+    {
+        self.my_vec.as_mut_ptr()
+    }
+
+    /// Gets length of underlying vector
+    pub fn len(&self) -> usize
+    {
+        self.my_vec.len()
     }
 }
 
