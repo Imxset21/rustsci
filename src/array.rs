@@ -208,6 +208,7 @@ impl <T> Mul for Array<T>
 }
 
 /// Convenience macro for creating arrays in a vec!-like way
+#[macro_export]
 macro_rules! arr
 {
     ( $( $x:expr ),* ) =>

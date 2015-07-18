@@ -4,10 +4,10 @@
 
 extern crate libc;
 
-#[macro_use] mod array;
-#[macro_use] mod matrix;
+#[macro_use] pub mod array;
+#[macro_use] pub mod matrix;
+pub mod lapacke;
 mod common;
-mod lapacke;
 
 #[cfg(test)]
 mod test
@@ -210,6 +210,31 @@ mod test
         let a = arr![1, 2, 3];
         let b = arr![4, 5, 6];
         assert_eq!(32, a * b);
+    }
+
+    #[test]
+    fn test_matrix_mul_generic_square()
+    {
+        let m1 = mat![[1, 2],
+                      [3, 4]];
+        let m2 = mat![[5, 6],
+                      [7, 8]];
+        let m3 = mat![[19, 22],
+                      [43, 50]];
+        assert_eq!(m3, m1 * m2);
+    }
+
+    #[test]
+    fn test_matrix_mul_generic_nonsquare()
+    {
+        let m1 = mat![[1, 2, 3],
+                      [4, 5, 6]];
+        let m2 = mat![[7, 8],
+                      [9, 10],
+                      [11, 12]];
+        let m3 = mat![[58, 64],
+                      [139, 154]];
+        assert_eq!(m3, m1 * m2);
     }
 }
 

@@ -5,9 +5,9 @@
 
 use common::Transposable;
 
-use std::ops::{Add, Sub, Index, IndexMut};
+use std::ops::{Add, Sub, Index, IndexMut, Mul};
 use std::cmp::PartialEq;
-
+use std::fmt::Debug;
 
 /// Regular ol' matrix. No sparseness or any of that garbage, that's for later.
 #[derive(Debug)]
@@ -261,7 +261,7 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
             panic!("Index out of bounds.");
         }
 
-        return &self.my_dat[i * self.num_rows + j]
+        return &self.my_dat[(i * self.num_cols) + j];
     }
 
     /// Sets the value at the matrix's index coordinates
@@ -272,7 +272,7 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
             panic!("Indices out of bounds.");
         }
 
-        self.my_dat[i * self.num_rows + j] = val;
+        self.my_dat[(i * self.num_cols) + j] = val;
     }
 
     /// Gets the dimension of the matrix as a tuple (num_rows, num_cols)
@@ -320,8 +320,69 @@ impl <T> IndexMut<(usize, usize)> for Matrix<T>
     }
 }
 
+/// Naive matrix product
+impl <T> Mul for Matrix<T>
+    where T: Add<Output=T> + Sub + Copy + PartialEq + Mul<Output=T> + Debug
+{
+    type Output = Matrix<T>;
+
+    fn mul(self, _rhs: Matrix<T>) -> Matrix<T>
+    {
+        // A is n x m, B is m x p.
+        if self.num_cols != _rhs.num_rows  // m != m
+        {
+            panic!("Invalid dimensions for matrix multiplication.")
+        }
+
+        let n = self.num_rows;
+        let m = self.num_cols;
+        let p = _rhs.num_cols;
+
+        // TODO: Rewrite as a sries of folds, colletcs, etc.
+        let mut toplevel: Vec<Vec<T>> = Vec::with_capacity(n);
+        for i in (0..n)
+        {
+            let mut curr_col: Vec<T> = Vec::with_capacity(p);
+            for j in (0..p)
+            {
+                // AB[(i, j)] = ...
+                // let sum : Option<T> = (0..m-1).fold(
+                //     None,
+                //     |sum_val, k| match sum_val {
+                //         None => Some(self[(i, k)] * _rhs[(k, j)]),
+                //         Some(curr_val) => Some(curr_val + (self[(i, k)] * _rhs[(k, j)]))
+                //     }
+                //     );
+                let mut sum : Option<T> = None;
+
+                for k in (0..m)
+                {
+                    sum = match sum
+                    {
+                        // No value yet, assume first value
+                        None => Some(self[(i, k)] * _rhs[(k, j)]),
+                        Some(curr_val) => Some(self[(i, k)] * _rhs[(k, j)] + curr_val)
+                    };
+                    println!("k, sum: {}, {:?}", k, sum);
+                }
+                
+                println!("i, j, sum: {}, {}, {:?}", i, j, sum);
+
+                match sum {
+                    Some(sum_val) => curr_col.push(sum_val),
+                    None => panic!("Error computing matrix product")
+                };
+            }
+            toplevel.push(curr_col);
+        }
+        
+        // Return new matrix
+        return Matrix::<T>::new(toplevel);
+    }
+}
 
 /// Convenience macro for creating matrices, like vec!
+#[macro_export]
 macro_rules! mat
 {
     (
