@@ -20,8 +20,8 @@ before_script:
 
 script:
   - |
-      travis-cargo build &&
-      travis-cargo test
+      cargo build &&
+      cargo test
 after_success:
   - travis-cargo coveralls --no-sudo
 
