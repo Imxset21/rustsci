@@ -1,6 +1,7 @@
 language: rust
 rust: nightly
 sudo: false
+cache: apt
 
 addons:
   apt:
