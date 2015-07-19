@@ -1,4 +1,4 @@
-# rustsci  [![Build Status](https://travis-ci.org/Imxset21/rustsci.svg?branch=master)](https://travis-ci.org/Imxset21/rustsci)[![Coverage Status](https://coveralls.io/repos/Imxset21/rustsci/badge.svg?branch=master&service=github)](https://coveralls.io/github/Imxset21/rustsci?branch=master)
+# rustsci  [![Build Status](https://travis-ci.org/Imxset21/rustsci.svg?branch=master)](https://travis-ci.org/Imxset21/rustsci) [![Coverage Status](https://coveralls.io/repos/Imxset21/rustsci/badge.svg?branch=master&service=github)](https://coveralls.io/github/Imxset21/rustsci?branch=master)
 
 Rust adaptation of SciPy, with a native generic array/matrix implementation.
 
