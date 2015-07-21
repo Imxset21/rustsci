@@ -20,6 +20,10 @@ mod test
     use common::Transposable;
     use std::mem;
 
+    /////////////////
+    // Array Tests //
+    /////////////////
+    
     #[test]
     fn test_arr_eq()
     {
@@ -54,6 +58,26 @@ mod test
         assert_eq!(mem::size_of_val(&a), mem::size_of_val(&b));
     }
 
+    #[test]
+    fn test_arr_indx()
+    {
+        let mut a = array::Array::<i32>::new(vec![1, 2, 3], array::Order::Row);
+        a[0] = 5;
+        assert_eq!(a[0], 5);
+    }
+
+    #[test]
+    fn test_arr_macro()
+    {
+        let a = arr![1, 2, 3];
+        let b = array::Array::<i32>::new(vec![1, 2, 3], array::Order::Row);
+        assert_eq!(a, b);
+    }
+
+    //////////////////
+    // Matrix Tests //
+    //////////////////
+    
     #[test]
     fn test_mat_add()
     {
@@ -136,22 +160,6 @@ mod test
     }
 
     #[test]
-    fn test_arr_indx()
-    {
-        let mut a = array::Array::<i32>::new(vec![1, 2, 3], array::Order::Row);
-        a[0] = 5;
-        assert_eq!(a[0], 5);
-    }
-
-    #[test]
-    fn test_arr_macro()
-    {
-        let a = arr![1, 2, 3];
-        let b = array::Array::<i32>::new(vec![1, 2, 3], array::Order::Row);
-        assert_eq!(a, b);
-    }
-
-    #[test]
     fn test_square_mat_macro()
     {
         let n = matrix::Matrix::<i32>::new(vec![vec![1, 2, 3], vec![4, 5, 6]]);
@@ -194,19 +202,6 @@ mod test
     }
 
     #[test]
-    fn test_mat_cholesky()
-    {
-        let mut m = mat![[25., 15., -5.],
-                         [15., 18., 0.],
-                         [-5., 0., 11.]];
-        let result = mat![[5., 3., -1.],
-                          [0., 3., 1.],
-                          [0., 0., 3.]];
-        lapacke::cholesky_decomposition(&mut m);
-        assert_eq!(m, result);
-    }
-
-    #[test]
     fn test_arr_dot_product_generic()
     {
         let a = arr![1, 2, 3];
@@ -239,6 +234,27 @@ mod test
         assert_eq!(m3, m1 * m2);
     }
 
+    ///////////////////
+    // LAPACKE Tests //
+    ///////////////////
+
+    #[test]
+    fn test_mat_cholesky()
+    {
+        let mut m = mat![[25., 15., -5.],
+                         [15., 18., 0.],
+                         [-5., 0., 11.]];
+        let result = mat![[5., 3., -1.],
+                          [0., 3., 1.],
+                          [0., 0., 3.]];
+        lapacke::cholesky_decomposition(&mut m);
+        assert_eq!(m, result);
+    }
+
+    ////////////////////
+    // OpenBLAS Tests //
+    ////////////////////
+    
     #[test]
     fn test_openblas_ddot()
     {
@@ -301,6 +317,22 @@ mod test
         
         let result_arr = arr![6f32, 12f32, 18f32];
         assert_eq!(result_arr, a2);
+    }
+
+    #[test]
+    fn test_openblas_snrm2()
+    {
+        let arr = arr![8f32, 4f32, 1f32, 0f32];
+        let norm : f32 = openblas::openblas_snrm2(&arr);
+        assert_eq!(norm, 9f32);
+    }
+
+    #[test]
+    fn test_openblas_dnrm2()
+    {
+        let arr = arr![8f64, 4f64, 1f64, 0f64];
+        let norm : f64 = openblas::openblas_dnrm2(&arr);
+        assert_eq!(norm, 9f64);
     }
 }
 

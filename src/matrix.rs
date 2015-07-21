@@ -18,7 +18,7 @@ pub struct Matrix<T> where T: Add + Sub + Copy + PartialEq
     num_cols: usize,
 }
 
-/// Private (?) helper function
+/// Returns the dimensions of a vector of vectors as a two-tuple.
 fn get_content_dims<T>(contents: &Vec<Vec<T>>) -> (usize, usize)
     where T: Add + Sub + Copy + PartialEq
 {
@@ -31,7 +31,7 @@ fn get_content_dims<T>(contents: &Vec<Vec<T>>) -> (usize, usize)
     }
 }
 
-/// Validates whether a vector of vectors is consistent
+/// Validates whether all vectors in a vector of vectors are size-consistent.
 fn validate_contents<T>(contents: &Vec<Vec<T>>) -> bool
     where T: Add + Sub + Copy + PartialEq
 {
@@ -52,7 +52,7 @@ fn validate_contents<T>(contents: &Vec<Vec<T>>) -> bool
     }
 }
 
-/// Allows for matrix transposing
+/// Implements the trait for Matrices to allow for transposing.
 impl<T> Transposable for Matrix<T> where T: Add + Sub + Copy + PartialEq
 {
     fn transpose(self) -> Matrix<T>
@@ -81,6 +81,7 @@ impl<T> Transposable for Matrix<T> where T: Add + Sub + Copy + PartialEq
 
 impl<T> Matrix<T> where T: Add + Sub + Copy + PartialEq
 {
+    /// Initialization method to create a Matrix from a vector of vectors.
     pub fn new(contents: Vec<Vec<T>>) -> Matrix<T>
     {
         if !validate_contents(&contents)
@@ -108,7 +109,7 @@ impl<T> Matrix<T> where T: Add + Sub + Copy + PartialEq
         }
     }
 
-    #[allow(dead_code)]    
+    /// Creates a new Matrix from a Vector, with given dimensions.
     pub fn new_from_vec(contents: Vec<T>,
                         num_rows: usize,
                         num_cols: usize) -> Matrix<T>
@@ -156,7 +157,7 @@ impl<T> Add for Matrix<T> where T: Add<Output=T> + Sub + Copy + PartialEq
     }
 }
 
-/// Implementation of the Add trait
+/// Implementation of the Sub trait
 impl<T> Sub for Matrix<T> where T: Add + Sub<Output=T> + Copy + PartialEq
 {
     type Output = Matrix<T>;
@@ -212,7 +213,7 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
         self.num_rows == self.num_cols
     }
 
-    /// Zero-out upper trigonal "corner" of the matrix with the given "zero" value
+    /// Zero-out upper trigonal "corner" of the matrix with the given "zero" value.
     pub fn zero_trigonal_upper(&mut self, zero_val: T)
     {
         if !self.is_square()
@@ -232,7 +233,7 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
         }
     }
 
-    /// Zero-out lower trigonal "corner" of the matrix with the given "zero" value
+    /// Zero-out lower trigonal "corner" of the matrix with the given "zero" value.
     pub fn zero_trigonal_lower(&mut self, zero_val: T)
     {
         if !self.is_square()
@@ -252,7 +253,7 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
         }
     }
 
-    /// Gets a reference to the value at the matrix's index coordinates
+    /// Gets a reference to the value at the matrix's index coordinates.
     pub fn get(&self, i: usize, j: usize) -> &T
     {
         if i > self.num_rows || j > self.num_cols
@@ -263,7 +264,7 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
         return &self.my_dat[(i * self.num_cols) + j];
     }
 
-    /// Sets the value at the matrix's index coordinates
+    /// Sets the value at the matrix's index coordinates.
     pub fn set(&mut self, i: usize, j: usize, val: T)
     {
         if i > self.num_rows || j > self.num_cols
@@ -274,25 +275,26 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
         self.my_dat[(i * self.num_cols) + j] = val;
     }
 
-    /// Gets the dimension of the matrix as a tuple (num_rows, num_cols)
+    /// Gets the dimension of the matrix as a two-tuple (num_rows, num_cols).
     pub fn get_dims(&self) -> (usize, usize)
     {
         (self.num_rows, self.num_cols)
     }
 
-    /// Gets the underlying matrix data as a raw pointer
+    /// Gets the underlying matrix data as a raw pointer.
     pub unsafe fn as_ptr(&self) -> *const T
     {
         self.my_dat.as_ptr()
     }
 
-    /// Gets the underlying matrix data as a mutable pointer
+    /// Gets the underlying matrix data as a mutable pointer.
     pub unsafe fn as_mut_ptr(&mut self) -> *mut T
     {
         self.my_dat.as_mut_ptr()
     }
 }
 
+/// Allows for using a tuple as indexing, e.g. m[(1, 2)]
 impl <T> Index<(usize, usize)> for Matrix<T>
     where T: Add + Sub + Copy + PartialEq
 {
@@ -305,6 +307,7 @@ impl <T> Index<(usize, usize)> for Matrix<T>
     }
 }
 
+/// Allows for using a tuple as mutable indexing, e.g. m[(1, 2)] = 4
 impl <T> IndexMut<(usize, usize)> for Matrix<T>
     where T: Add + Sub + Copy + PartialEq
 {
@@ -319,7 +322,7 @@ impl <T> IndexMut<(usize, usize)> for Matrix<T>
     }
 }
 
-/// Naive matrix product
+/// Generic matrix product implementation (for non-BLAS types).
 impl <T> Mul for Matrix<T>
     where T: Add<Output=T> + Sub + Copy + PartialEq + Mul<Output=T>
 {

@@ -12,9 +12,7 @@ use std::cmp::PartialEq;
 pub enum Order { Column, Row}
 
 #[derive(Debug)]
-/// An array is a boxed vector with additional information (e.g. stride).
-/// Arrays support generics as long as they meet the following criteria:
-/// 1. 
+/// An array is a size-static vector with type restrictions.
 pub struct Array<T> where T: Add + Sub + Copy + PartialEq
 {
     my_vec: Vec<T>,
@@ -35,6 +33,7 @@ impl<T> Array<T> where T: Add + Sub + Copy + PartialEq
     }
 }
 
+/// Implements transposability trait for Arrays.
 impl<T> Transposable for Array<T>
     where T: Add<Output=T> + Sub + Copy + PartialEq
 {
@@ -52,7 +51,7 @@ impl<T> Transposable for Array<T>
     }
 }
 
-/// Implementation of the Add trait
+/// Implementation of the Add trait.
 impl<T> Add for Array<T> where T: Add<Output=T> + Sub + Copy + PartialEq
 {
     type Output = Array<T>;
@@ -84,7 +83,7 @@ impl<T> Add for Array<T> where T: Add<Output=T> + Sub + Copy + PartialEq
     }
 }
 
-/// Implementation of the Subtract trait
+/// Implementation of the Subtract trait.
 impl<T> Sub for Array<T> where T: Add + Sub<Output=T> + Copy + PartialEq
 {
     type Output = Array<T>;
@@ -155,7 +154,7 @@ impl <T> Index<usize> for Array<T>
     }
 }
 
-/// Enables things like a[0] = 3, where a is an Array
+/// Enables setting an array value via index, e.g. a[0] = 3
 impl <T> IndexMut<usize> for Array<T>
     where T: Add + Sub + Copy + PartialEq
 {
@@ -169,7 +168,7 @@ impl <T> IndexMut<usize> for Array<T>
     }
 }
 
-/// Implements the multiplication trait as a dot product
+/// Implements the multiplication trait as a generic dot product
 impl <T> Mul for Array<T>
     where T: Add<Output=T> + Sub + Copy + PartialEq + Mul<Output=T>
 {
@@ -182,15 +181,6 @@ impl <T> Mul for Array<T>
             panic!("Cannot dot product different-length arrays.")
         }
         
-        // let sum : Option<T> = None;
-        // for (a_i, b_i) in self.my_vec.into_iter().zip(_rhs.my_vec.into_iter())
-        // {
-        //     sum = match sum {
-        //         None => Some(a_i * b_i),
-        //         Some(sum_val) => Some(sum_val + (a_i * b_i))
-        //     };
-        // }
-
         let sum: Option<T> =
             self.my_vec.into_iter().zip(_rhs.my_vec.into_iter()).fold(
                 None,
