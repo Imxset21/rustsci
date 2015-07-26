@@ -8,7 +8,6 @@ extern crate libc;
 #[macro_use] pub mod matrix;
 pub mod lapacke;
 pub mod openblas;
-mod common;
 
 #[cfg(test)]
 mod test
@@ -17,7 +16,6 @@ mod test
     use matrix;
     use lapacke;
     use openblas;
-    use common::Transposable;
     use std::mem;
 
     /////////////////

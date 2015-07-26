@@ -1,9 +1,5 @@
 // Array type
 
-// mod common;  // <- Uncomment for static analysis tools
-
-use common::Transposable;
-
 use std::ops::{Add, Sub, Index, IndexMut, Mul};
 use std::cmp::PartialEq;
 
@@ -31,13 +27,9 @@ impl<T> Array<T> where T: Add + Sub + Copy + PartialEq
             order: order
         }
     }
-}
 
-/// Implements transposability trait for Arrays.
-impl<T> Transposable for Array<T>
-    where T: Add<Output=T> + Sub + Copy + PartialEq
-{
-    fn transpose(self) -> Array<T>
+    /// Transposes an array by flipping its orientation.
+    pub fn transpose(self) -> Array<T>
     {
         let mut order = self.order;
         if order == Order::Column

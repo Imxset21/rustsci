@@ -1,4 +1,3 @@
-// #![feature(libc)]   // <- Uncomment for static analysis
 // extern crate libc; // <- Uncomment for static analysis
 // mod matrix;  // <- Uncomment for static analysis
 

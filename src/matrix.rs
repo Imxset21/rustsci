@@ -1,9 +1,6 @@
 // Matrix type
 
 // #![feature(step_by)]  // <- Uncomment for static analysis tools
-// mod common;  // <- Uncomment for static analysis tools
-
-use common::Transposable;
 
 use std::ops::{Add, Sub, Index, IndexMut, Mul};
 use std::cmp::PartialEq;
@@ -49,83 +46,6 @@ fn validate_contents<T>(contents: &Vec<Vec<T>>) -> bool
             }
         }
         return true;
-    }
-}
-
-/// Implements the trait for Matrices to allow for transposing.
-impl<T> Transposable for Matrix<T> where T: Add + Sub + Copy + PartialEq
-{
-    fn transpose(self) -> Matrix<T>
-    {
-        let mut new_vec = Vec::<T>::with_capacity(self.my_dat.len());
-        let new_rows = self.num_cols;
-        let new_cols = self.num_rows;
-
-        for i in (0..new_rows)
-        {
-            for new_indx in (i..new_vec.len()).step_by(new_rows)
-            {
-                new_vec.push(self.my_dat[new_indx])
-            }
-        }
-
-        Matrix
-        {
-            my_dat: new_vec,
-            col_ordering: true,
-            num_rows: new_rows,
-            num_cols: new_cols,
-        }
-    }
-}
-
-impl<T> Matrix<T> where T: Add + Sub + Copy + PartialEq
-{
-    /// Initialization method to create a Matrix from a vector of vectors.
-    pub fn new(contents: Vec<Vec<T>>) -> Matrix<T>
-    {
-        if !validate_contents(&contents)
-        {
-            panic!("Matrix contents are invalid: dimensions inconsistent.")
-        }
-        let (num_rows, num_cols) = get_content_dims(&contents);
-
-        // Flattened iterator that goes through the entire matrix at once
-        let flattened = contents.iter().flat_map(|y| y.iter());
-
-        let mut new_vec = Vec::<T>::with_capacity(num_rows * num_cols);
-        for i in flattened
-        {
-            new_vec.push(*i);
-        }
-
-        // Return new matrix
-        Matrix
-        {
-            my_dat: new_vec,
-            col_ordering: true,
-            num_rows: num_rows,
-            num_cols: num_cols,
-        }
-    }
-
-    /// Creates a new Matrix from a Vector, with given dimensions.
-    pub fn new_from_vec(contents: Vec<T>,
-                        num_rows: usize,
-                        num_cols: usize) -> Matrix<T>
-    {
-        if contents.len() % (num_rows * num_cols) != 0
-        {
-            panic!("Mismatch between matrix contents and dimensions.");
-        }
-
-        Matrix
-        {
-            my_dat: contents,
-            col_ordering: true,
-            num_rows: num_rows,
-            num_cols: num_cols,
-        }
     }
 }
 
@@ -207,6 +127,77 @@ impl<T> PartialEq for Matrix<T> where T: Add<Output=T> + Sub + Copy + PartialEq
 /// Primary implementation of public methods for generic matrices
 impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
 {
+    /// Initialization method to create a Matrix from a vector of vectors.
+    pub fn new(contents: Vec<Vec<T>>) -> Matrix<T>
+    {
+        if !validate_contents(&contents)
+        {
+            panic!("Matrix contents are invalid: dimensions inconsistent.")
+        }
+        let (num_rows, num_cols) = get_content_dims(&contents);
+
+        // Flattened iterator that goes through the entire matrix at once
+        let flattened = contents.iter().flat_map(|y| y.iter());
+
+        let mut new_vec = Vec::<T>::with_capacity(num_rows * num_cols);
+        for i in flattened
+        {
+            new_vec.push(*i);
+        }
+
+        // Return new matrix
+        Matrix
+        {
+            my_dat: new_vec,
+            col_ordering: true,
+            num_rows: num_rows,
+            num_cols: num_cols,
+        }
+    }
+
+    /// Creates a new Matrix from a Vector, with given dimensions.
+    pub fn new_from_vec(contents: Vec<T>,
+                        num_rows: usize,
+                        num_cols: usize) -> Matrix<T>
+    {
+        if contents.len() % (num_rows * num_cols) != 0
+        {
+            panic!("Mismatch between matrix contents and dimensions.");
+        }
+
+        Matrix
+        {
+            my_dat: contents,
+            col_ordering: true,
+            num_rows: num_rows,
+            num_cols: num_cols,
+        }
+    }
+    
+    /// Transposes a matrix by 'rotating' it by its diagonal.
+    pub fn transpose(self) -> Matrix<T>
+    {
+        let mut new_vec = Vec::<T>::with_capacity(self.my_dat.len());
+        let new_rows = self.num_cols;
+        let new_cols = self.num_rows;
+
+        for i in (0..new_rows)
+        {
+            for new_indx in (i..new_vec.len()).step_by(new_rows)
+            {
+                new_vec.push(self.my_dat[new_indx])
+            }
+        }
+
+        Matrix
+        {
+            my_dat: new_vec,
+            col_ordering: true,
+            num_rows: new_rows,
+            num_cols: new_cols,
+        }
+    }
+    
     /// Returns true if-and-only-if the matrix is square.
     pub fn is_square(&self) -> bool
     {
