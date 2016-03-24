@@ -2,7 +2,14 @@
 // mod array;         // <- Uncomment for static analysis
 
 use array::Array;
+use matrix::Matrix;
 use libc::{c_int, c_double, c_float};
+
+enum CblasOrder {CblasRowMajor=101, CblasColMajor=102}
+enum CblasTranspose {CblasNoTrans=111, CblasTrans=112, CblasConjTrans=113}
+enum CblasUplo {CblasUpper=121, CblasLower=122}
+enum CblasDiag {CblasNonUnit=131, CblasUnit=132}
+enum CblasSide {CblasLeft=141, CblasRight=142}
 
 #[link(name = "blas")]
 extern
@@ -20,7 +27,7 @@ extern
     /// Computes the sum of magnitudes of the vector elements, single precision
     fn cblas_sasum(N: c_int, X: *const c_float, incX: c_int) -> c_float;
     
-    /// Computes the sum of magnitudes of the vector elements, single precision
+    /// Computes the sum of magnitudes of the vector elements, double precision
     fn cblas_dasum(N: c_int, X: *const c_double, incX: c_int) -> c_double;
 
     /// Computes a vector-scalar product and adds the result to a vector (f32)
@@ -38,6 +45,24 @@ extern
 
     /// Computes the Euclidean norm of a vector (f64)
     fn cblas_dnrm2(n: c_int, X: *const f64, incx: c_int) -> c_double;
+
+    /// Matrix vector multiply (f32) - alpha * A * x + beta * y
+    fn cblas_sgemv(
+        order: c_int,
+        TransA: c_int, M: c_int, N: c_int,
+        alpha: c_float, A: *const f32, lda: c_int,
+        X: *const f32, incX: c_int, beta: c_float,
+        Y: *mut f32, incY: c_int);
+
+    /// Matrix-Matrix multiply (f32) - alpha * A * B + beta * C
+    fn cblas_sgemm(
+        order: c_int, TransA: c_int, TransB: c_int,
+        M: c_int, N: c_int, K: c_int,
+        alpha: c_float, A: *const f32,
+        lda: c_int, B: *const f32, ldb: c_int,
+        beta: c_float, C: *mut f32, ldc: c_int
+    );
+
 }
 
 /// OpenBLAS computation of the dot product of two vectors, double precision
@@ -166,4 +191,79 @@ pub fn openblas_dnrm2(arr_a: &Array<f64>) -> f64
     unsafe {
         return cblas_dnrm2(n, arr_a.as_ptr() as *const f64, incx) as f64;
     }
+}
+
+/// Computes alpha*A*x + beta*y, where A is an m-by-n matrix, x and y are vectors
+pub fn openblas_sgemv(
+    mat_a: &Matrix<f32>,
+    arr_x: &Array<f32>,
+    arr_y: &Array<f32>,
+    alpha: f32,
+    beta: f32) -> Array<f32>
+{
+    let (nrows, ncols) = mat_a.get_dims();
+    // TODO: Fix this check to actually check the right dimensions
+    if nrows != arr_x.len()
+    {
+        panic!("Mistmatched matrix and array dimensions: {} vs {}", nrows, arr_x.len());
+    }
+    let mut m1 = arr_y.clone();
+
+    unsafe {
+        cblas_sgemv(
+            CblasOrder::CblasRowMajor as c_int,
+            CblasTranspose::CblasNoTrans as c_int, nrows as c_int, ncols as c_int,
+            alpha as c_float, mat_a.as_ptr() as *const f32, nrows as c_int,
+            arr_x.as_ptr() as *const f32, 1 as c_int, beta as c_float,
+            m1.as_mut_ptr() as *mut f32, 1 as c_int);
+    }
+    return m1;
+}
+
+/// Computes alpha * A * B + beta * C.
+/// Alpha and beta are scalars, and A, B and C are matrices, with A an m-by-k
+/// matrix, B a k-by-n matrix and C an m-by-n matrix.
+pub fn openblas_sgemm(
+    mat_a: &Matrix<f32>,
+    mat_b: &Matrix<f32>,
+    mat_c: &Matrix<f32>,
+    alpha: f32,
+    beta: f32) -> Matrix<f32>
+{
+    let (a_nrows, a_ncols) = mat_a.get_dims();
+    let (b_nrows, b_ncols) = mat_b.get_dims();
+    let (c_nrows, c_ncols) = mat_c.get_dims();
+
+    if a_nrows != c_nrows
+    {
+        panic!("Dimensions for A ({}, {}) mismatched with other matrices",
+               a_nrows, a_ncols);
+    }
+    if a_ncols != b_nrows
+    {
+        panic!("Dimensions for B ({}, {}) mismatched with other matrices",
+               b_nrows, b_ncols);        
+    }
+    if b_ncols != c_ncols
+    {
+        panic!("Dimensions for C ({}, {}) mismatched with other matrices",
+               c_nrows, c_ncols);
+    }
+
+    let mut mat_c_out = mat_c.clone();
+
+    unsafe {
+        cblas_sgemm(
+            CblasOrder::CblasRowMajor as c_int,
+            CblasTranspose::CblasNoTrans as c_int,
+            CblasTranspose::CblasNoTrans as c_int,
+            a_nrows as c_int, b_ncols as c_int, b_nrows as c_int,
+            alpha as c_float,
+            mat_a.as_ptr() as *const f32, a_nrows as c_int,
+            mat_b.as_ptr() as *const f32, b_nrows as c_int,
+            beta as c_float,
+            mat_c_out.as_mut_ptr() as *mut f32, c_nrows as c_int
+        );
+    }
+    return mat_c_out;
 }

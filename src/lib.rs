@@ -332,6 +332,58 @@ mod test
         let norm : f64 = openblas::openblas_dnrm2(&arr);
         assert_eq!(norm, 9f64);
     }
+
+    #[test]
+    fn test_filled_new()
+    {
+        let m1 = matrix::Matrix::<f32>::new_filled(0f32, 3, 3);
+        let m2 = mat![[0f32, 0f32, 0f32],
+                      [0f32, 0f32, 0f32],
+                      [0f32, 0f32, 0f32]];
+        assert_eq!(m1, m2);
+    }
+
+    #[test]
+    fn test_openblas_sgemv()
+    {
+        let mat_a = mat![[25f32, 15f32, -5f32],
+                         [15f32, 18f32, 0f32],
+                         [-5f32, 0f32, 11f32]];
+        let arr_x = arr![8f32, 4f32, 1f32];
+        let arr_y = array::Array::<f32>::new_filled(0f32, 3, array::Order::Row);
+        let alpha = 1f32;
+        let beta = 1f32;
+
+        let ymat = openblas::openblas_sgemv(&mat_a, &arr_x, &arr_y, alpha, beta);
+        let resultm = arr![255f32, 192f32, -29f32];
+        assert_eq!(ymat, resultm);
+    }
+
+    #[test]
+    fn test_openblas_sgemm()
+    {
+        let mat_a = mat![[25f32, 15f32, -5f32],
+                         [15f32, 18f32,  0f32],
+                         [-5f32,  0f32, 11f32]];
+        let mat_b = mat![[7f32, 15f32, -12f32],
+                         [1f32, -14f32,  1f32],
+                         [-5f32,  1f32, -11f32]];
+        let mat_c = mat![[1f32, 0f32, 0f32],
+                         [0f32, 1f32, 0f32],
+                         [0f32, 0f32, 1f32]];
+        let alpha = 1f32;
+        let beta = 1f32;
+
+        let c_mat = openblas::openblas_sgemm(&mat_a, &mat_b, &mat_c, alpha, beta);
+
+        let result_mat = mat![[216f32, 160f32, -230f32],
+                              [123f32, -26f32, -162f32],
+                              [-90f32, -64f32, -60f32]];
+
+        assert_eq!(c_mat, result_mat);
+    
+    }
+        
 }
 
 

@@ -6,7 +6,7 @@ use std::ops::{Add, Sub, Index, IndexMut, Mul};
 use std::cmp::PartialEq;
 
 /// Regular ol' matrix. No sparseness or any of that garbage, that's for later.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Matrix<T> where T: Add + Sub + Copy + PartialEq
 {
     my_dat: Vec<T>,
@@ -155,6 +155,18 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
         }
     }
 
+    /// Creates a new Matrix filled with a given value, with given dimensions
+    pub fn new_filled(value: T, num_rows: usize, num_cols: usize) -> Matrix<T>
+    {
+        Matrix
+        {
+            my_dat: vec![value; num_rows * num_cols],
+            col_ordering: true,
+            num_rows: num_rows,
+            num_cols: num_cols,
+        }
+    }
+
     /// Creates a new Matrix from a Vector, with given dimensions.
     pub fn new_from_vec(contents: Vec<T>,
                         num_rows: usize,
@@ -181,7 +193,7 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
         let new_rows = self.num_cols;
         let new_cols = self.num_rows;
 
-        for i in (0..new_rows)
+        for i in 0..new_rows
         {
             for new_indx in (i..new_vec.len()).step_by(new_rows)
             {
@@ -212,9 +224,9 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
             panic!("Matrix must be square.");
         }
         let n = self.num_rows;
-        for i in (0..n)
+        for i in 0..n
         {
-            for j in (0..n)
+            for j in 0..n
             {
                 if i > j
                 {
@@ -232,9 +244,9 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
             panic!("Matrix must be square.");
         }
         let n = self.num_rows;
-        for i in (0..n)
+        for i in 0..n
         {
-            for j in (0..n)
+            for j in 0..n
             {
                 if i < j
                 {
@@ -331,12 +343,12 @@ impl <T> Mul for Matrix<T>
         let m = self.num_cols;
         let p = _rhs.num_cols;
 
-        // TODO: Rewrite as a sries of folds, colletcs, etc.
+        // TODO: Rewrite as a series of folds, colletcs, etc.
         let mut toplevel: Vec<Vec<T>> = Vec::with_capacity(n);
-        for i in (0..n)
+        for i in 0..n
         {
             let mut curr_col: Vec<T> = Vec::with_capacity(p);
-            for j in (0..p)
+            for j in 0..p
             {
                 // AB[(i, j)] = ...
                 let sum : Option<T> = (0..m).fold(

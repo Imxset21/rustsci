@@ -2,28 +2,41 @@
 
 use std::ops::{Add, Sub, Index, IndexMut, Mul};
 use std::cmp::PartialEq;
+use std::slice;
 
 /// Enumerator for whether the vector is horizontal or vertical
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Order { Column, Row}
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// An array is a size-static vector with type restrictions.
 pub struct Array<T> where T: Add + Sub + Copy + PartialEq
 {
+    /// Internal vector used for backing store
     my_vec: Vec<T>,
+    /// Order of the array
     order: Order,
 }
 
+/// Generic implementation for any T that satisfies copying, add, sub, and eq
 impl<T> Array<T> where T: Add + Sub + Copy + PartialEq
 {
-    /// A public constructor
+    /// Default public constructor, moves the contents from the vec by default
     pub fn new(contents: Vec<T>, order: Order) -> Array<T>
     {
         Array
         {
-            // I guess this is a copy constructor?
             my_vec: contents,
+            order: order
+        }
+    }
+
+    /// Constructs an array with a given value, length, and order
+    pub fn new_filled(val: T, len: usize, order: Order) -> Array<T>
+    {
+        Array
+        {
+            my_vec: vec![val; len],
             order: order
         }
     }
@@ -40,6 +53,20 @@ impl<T> Array<T> where T: Add + Sub + Copy + PartialEq
         }
 
         Array {my_vec: self.my_vec, order: order}
+    }
+
+    /// Returns a slice (in-memory view) of the entire array
+    fn as_slice(&self) -> &[T]
+    {
+        return self.my_vec.as_slice();
+    }
+
+    /// Returns an iterator over size elements of the slice at a time. The
+    /// chunks do not overlap. If size does not divide the length of the slice,
+    /// then the last chunk will not have length size.
+    fn chunks(&self, size: usize) -> slice::Chunks<T>
+    {
+        return self.my_vec.chunks(size);
     }
 }
 
