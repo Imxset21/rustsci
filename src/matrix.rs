@@ -1,5 +1,6 @@
 use std::ops::{Add, Sub, Index, IndexMut, Mul};
 use std::cmp::PartialEq;
+use std::cmp::max;
 
 //////////////////////////////////////////
 // Non-Sparse Non-Symmetric Matrix Type //
@@ -187,7 +188,7 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
     }
     
     /// Transposes a matrix by 'rotating' it by its diagonal.
-    pub fn transpose(self) -> Matrix<T>
+    pub fn transpose(&self) -> Matrix<T>
     {
         let mut new_vec = Vec::<T>::with_capacity(self.my_dat.len());
         let new_rows = self.num_cols;
@@ -416,54 +417,35 @@ fn get_symmat_index(mut i: usize, mut j: usize, n: usize) -> usize
 /// Primary implementation of public methods for generic matrices
 impl <T> SymMat<T> where T: Add + Sub + Copy + PartialEq
 {
-    /// Creates a new Symmetric Matrix filled with a given value
-    pub fn new_filled(value: T, dims: usize) -> SymMat<T>
-    {
-        if dims == 0
-        {
-            panic!("Matrix must have at least one element.");
-        } else if dims == 1 {
-            SymMat {
-                diag: value,
-                my_dat: vec![value],
-                col_order: true,
-                dims: dims,
-            }
-        } else {
-            SymMat {
-                diag: value,
-                my_dat: vec![value; (1..dims - 1).fold(0, |sum, x| sum + x)],
-                col_order: true,
-                dims: dims,
-            }
-        }
-    }
-
     /// Creates a symmetric matrix with diag on the diagonal, fill elsewhere
     pub fn new_diag_with_fill(diag: T, fill: T, dims: usize) -> SymMat<T>
     {
         if dims == 0
         {
             panic!("Matrix must have at least one element.");
-        } else if dims == 1 {
-            SymMat {
-                diag: diag,
-                my_dat: vec![diag],
-                col_order: true,
-                dims: dims,
-            }
-        } else {
-            SymMat {
-                diag: diag,
-                my_dat: vec![fill; (1..dims).fold(0, |sum, x| sum + x)],
-                col_order: true,
-                dims: dims,
-            }
+        }
+        
+        SymMat {
+            diag: diag,
+            my_dat: vec![fill; max(1, (1..dims).fold(0, |sum, x| sum + x))],
+            col_order: true,
+            dims: dims,
         }
     }
 
+    /// Creates a new Symmetric Matrix filled with a given value
+    pub fn new_filled(value: T, dims: usize) -> SymMat<T>
+    {
+        if dims == 0
+        {
+            panic!("Matrix must have at least one element.");
+        }
+        // Just a special case of new_diag_with_fill where diag == fill
+        return SymMat::<T>::new_diag_with_fill(value, value, dims);
+    }
+
     /// The transpose of a symmetric matrix is itself
-    pub fn transpose(self) -> SymMat<T>
+    pub fn transpose(&self) -> SymMat<T>
     {
         return self.clone();
     }

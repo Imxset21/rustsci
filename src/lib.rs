@@ -237,9 +237,18 @@ mod test
     ////////////////////////////
 
     #[test]
-    fn test_symmat_new_identity()
+    fn test_symmat_new_diag_with_fill()
     {
         let m1 = matrix::SymMat::<f32>::new_diag_with_fill(1f32, 0f32, 3);
+        println!("{:?}", m1);
+        let m2 = matrix::SymMat::<f32>::new_diag_with_fill(1f32, 0f32, 1);
+        println!("{:?}", m2);
+    }
+
+    #[test]
+    fn test_symmat_new_filled()
+    {
+        let m1 = matrix::SymMat::<f32>::new_filled(1f32, 3);
         println!("{:?}", m1);
     }
 
