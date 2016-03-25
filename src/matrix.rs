@@ -1,11 +1,11 @@
-// Matrix type
-
-// #![feature(step_by)]  // <- Uncomment for static analysis tools
-
 use std::ops::{Add, Sub, Index, IndexMut, Mul};
 use std::cmp::PartialEq;
 
-/// Regular ol' matrix. No sparseness or any of that garbage, that's for later.
+//////////////////////////////////////////
+// Non-Sparse Non-Symmetric Matrix Type //
+//////////////////////////////////////////
+
+/// Regular non-sparse, non-symmetric, non-trigonal matrix.
 #[derive(Debug, Clone)]
 pub struct Matrix<T> where T: Add + Sub + Copy + PartialEq
 {
@@ -382,5 +382,142 @@ macro_rules! mat
         ),*
     ) => {
         matrix::Matrix::new(vec![ $( vec![$( $x ),*]),*])
+    }
+}
+
+///////////////////////////
+// Symmetric Matrix Type //
+///////////////////////////
+
+/// Non-sparse Symmetric matrix. Must be square.
+#[derive(Debug, Clone)]
+pub struct SymMat<T> where T: Add + Sub + Copy + PartialEq
+{
+    diag: T,
+    my_dat: Vec<T>,
+    col_order: bool,
+    dims: usize,
+}
+
+/// Get the index of an element in a symmetric matrix based on its size
+fn get_symmat_index(mut i: usize, mut j: usize, n: usize) -> usize
+{
+    // Swap indices if necessary to use upper-diagonal
+    if j < i
+    {
+        let temp = j;
+        j = i;
+        i = temp;
+    }
+
+    return (i* n - (i- 1) * ((i- 1) + 1) / 2 + j - i) - (i+ 1);    
+}
+
+/// Primary implementation of public methods for generic matrices
+impl <T> SymMat<T> where T: Add + Sub + Copy + PartialEq
+{
+    /// Creates a new Symmetric Matrix filled with a given value
+    pub fn new_filled(value: T, dims: usize) -> SymMat<T>
+    {
+        if dims == 0
+        {
+            panic!("Matrix must have at least one element.");
+        } else if dims == 1 {
+            SymMat {
+                diag: value,
+                my_dat: vec![value],
+                col_order: true,
+                dims: dims,
+            }
+        } else {
+            SymMat {
+                diag: value,
+                my_dat: vec![value; (1..dims - 1).fold(0, |sum, x| sum + x)],
+                col_order: true,
+                dims: dims,
+            }
+        }
+    }
+
+    /// Creates a symmetric matrix with diag on the diagonal, fill elsewhere
+    pub fn new_diag_with_fill(diag: T, fill: T, dims: usize) -> SymMat<T>
+    {
+        if dims == 0
+        {
+            panic!("Matrix must have at least one element.");
+        } else if dims == 1 {
+            SymMat {
+                diag: diag,
+                my_dat: vec![diag],
+                col_order: true,
+                dims: dims,
+            }
+        } else {
+            SymMat {
+                diag: diag,
+                my_dat: vec![fill; (1..dims).fold(0, |sum, x| sum + x)],
+                col_order: true,
+                dims: dims,
+            }
+        }
+    }
+
+    /// The transpose of a symmetric matrix is itself
+    pub fn transpose(self) -> SymMat<T>
+    {
+        return self.clone();
+    }
+
+    /// Gets a reference to the value at the matrix's index coordinates.
+    pub fn get(&self, i: usize, j: usize) -> &T
+    {
+        if i > self.dims || j > self.dims
+        {
+            panic!("Index out of bounds.");
+        }
+
+        // Return the diagonal value
+        if i == j
+        {
+            return &self.diag;
+        }
+
+        return &self.my_dat[get_symmat_index(i, j, self.dims)];
+    }
+
+    /// Sets the value at the matrix's index coordinates.
+    pub fn set(&mut self, i: usize, j: usize, val: T)
+    {
+        if i > self.dims || j > self.dims
+        {
+            panic!("Indices out of bounds.");
+        }
+        
+        // Set the diagonal
+        if i == j
+        {
+            self.diag = val;
+            return;
+        }
+
+        self.my_dat[get_symmat_index(i, j, self.dims)] = val;
+    }
+
+    /// Gets the dimension of the matrix as a two-tuple (num_rows, num_cols).
+    pub fn get_dims(&self) -> (usize, usize)
+    {
+        (self.dims, self.dims)
+    }
+
+    /// Gets the underlying matrix data as a raw pointer.
+    pub unsafe fn as_ptr(&self) -> *const T
+    {
+        self.my_dat.as_ptr()
+    }
+
+    /// Gets the underlying matrix data as a mutable pointer.
+    pub unsafe fn as_mut_ptr(&mut self) -> *mut T
+    {
+        self.my_dat.as_mut_ptr()
     }
 }

@@ -232,6 +232,17 @@ mod test
         assert_eq!(m3, m1 * m2);
     }
 
+    ////////////////////////////
+    // Symmetric Matrix Tests //
+    ////////////////////////////
+
+    #[test]
+    fn test_symmat_new_identity()
+    {
+        let m1 = matrix::SymMat::<f32>::new_diag_with_fill(1f32, 0f32, 3);
+        println!("{:?}", m1);
+    }
+
     ///////////////////
     // LAPACKE Tests //
     ///////////////////
