@@ -1,19 +1,55 @@
 use std::ops::{Add, Sub, Index, IndexMut, Mul};
-use std::cmp::PartialEq;
-use std::cmp::max;
+use std::cmp::{PartialEq, max};
+use std::fmt;
 
 //////////////////////////////////////////
 // Non-Sparse Non-Symmetric Matrix Type //
 //////////////////////////////////////////
 
 /// Regular non-sparse, non-symmetric, non-trigonal matrix.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Matrix<T> where T: Add + Sub + Copy + PartialEq
 {
     my_dat: Vec<T>,
     col_ordering: bool,
     num_rows: usize,
     num_cols: usize,
+}
+
+impl <T> fmt::Debug for Matrix<T> where T: Add + Sub + Copy + PartialEq + fmt::Debug
+{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
+    {
+        // TODO: Change Matrix::fmt to use better seperators than \t
+        let mut count: usize = 0;
+        write!(f, "{}-by-{} matrix:\n[", self.num_rows, self.num_cols).expect("failed to write matrix");
+        for i in 0..self.num_rows
+        {
+            if i == 0
+            {
+                write!(f, "[").expect("failed to write matrix");
+            } else {
+                write!(f, " [").expect("failed to write matrix");
+            }
+            for j in 0..self.num_cols
+            {
+                if j + 1 == self.num_cols
+                {
+                    write!(f, "{:?}", self.my_dat[count]).expect("failed to write matrix");
+                } else {
+                    write!(f, "{:?},\t", self.my_dat[count]).expect("failed to write matrix");
+                }
+                count += 1;
+            }
+            if i + 1 == self.num_rows
+            {
+                write!(f, "]").expect("failed to write matrix");
+            } else {
+                write!(f, "]\n").expect("failed to write matrix");
+            }
+        }
+        write!(f, "]")
+    }
 }
 
 /// Returns the dimensions of a vector of vectors as a two-tuple.
@@ -52,7 +88,7 @@ fn validate_contents<T>(contents: &Vec<Vec<T>>) -> bool
     }
 }
 
-/// Implementation of the Add trait
+/// Implementation of the Add trait for generic matrices
 impl<T> Add for Matrix<T> where T: Add<Output=T> + Sub + Copy + PartialEq
 {
     type Output = Matrix<T>;
@@ -80,7 +116,7 @@ impl<T> Add for Matrix<T> where T: Add<Output=T> + Sub + Copy + PartialEq
     }
 }
 
-/// Implementation of the Sub trait
+/// Implementation of the Sub trait for generic matrices
 impl<T> Sub for Matrix<T> where T: Add + Sub<Output=T> + Copy + PartialEq
 {
     type Output = Matrix<T>;
@@ -316,7 +352,7 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
     }
 }
 
-/// Allows for using a tuple as indexing, e.g. m[(1, 2)]
+/// Enable tuple as indexing for generic matrices, e.g. m[(1, 2)]
 impl <T> Index<(usize, usize)> for Matrix<T>
     where T: Add + Sub + Copy + PartialEq
 {
@@ -329,7 +365,7 @@ impl <T> Index<(usize, usize)> for Matrix<T>
     }
 }
 
-/// Allows for using a tuple as mutable indexing, e.g. m[(1, 2)] = 4
+/// Enable tuple as mutable indexing for generic matrices, e.g. m[(1, 2)] = 4
 impl <T> IndexMut<(usize, usize)> for Matrix<T>
     where T: Add + Sub + Copy + PartialEq
 {
@@ -418,19 +454,29 @@ pub struct SymMat<T> where T: Add + Sub + Copy + PartialEq
     dims: usize,
 }
 
+/// Calculates the number of trigonal entries in a symmetric matrix of size n
+#[inline(always)]
+fn get_symmat_len(n: usize) -> usize
+{
+    (1..n).fold(0, |sum, x| sum + x)
+}
+
 /// Get the index of an element in a symmetric matrix based on its size
 #[inline(always)]
-fn get_symmat_index(mut i: usize, mut j: usize, n: usize) -> usize
+fn get_symmat_index(_i: usize, _j: usize, _n: usize) -> usize
 {
+    let mut i: i32 = _i as i32;
+    let mut j: i32 = _j as i32;
+    let n: i32 = _n as i32;
     // Swap indices if necessary to use upper-diagonal
     if j < i
     {
-        let temp = j;
+        let temp: i32 = j;
         j = i;
         i = temp;
     }
 
-    return (i * n - (i - 1) * ((i - 1) + 1) / 2 + j - i) - (i + 1);
+    return ((i * n - (i - 1) * ((i - 1) + 1) / 2 + j - i) - (i + 1)) as usize;
 }
 
 /// Generic implementation of public methods for symmetric matrices
@@ -446,10 +492,73 @@ impl <T> SymMat<T> where T: Add + Sub + Copy + PartialEq
         
         SymMat {
             diag: vec![diag; dims],
-            my_dat: vec![fill; max(1, (1..dims).fold(0, |sum, x| sum + x))],
+            my_dat: vec![fill; max(1, get_symmat_len(dims))],
             col_order: true,
             dims: dims,
         }
+    }
+
+    // Creates a symmetric matrix with given trigonal and diagonal vectors
+    pub fn new_from_vecs(diag: Vec<T>, trigonal: Vec<T>) -> SymMat<T>
+    {
+        let dims = diag.len();
+        if trigonal.len() != get_symmat_len(dims)
+        {
+            panic!("Vector size mismatch");
+        }
+        SymMat {
+            diag: diag,
+            my_dat: trigonal,
+            col_order: true,
+            dims: dims,
+        }
+    }
+
+    // Creates a new Symmetric Matrix from a trigonal of a generic mat
+    pub fn new_from_trig(mat: &Matrix<T>, upper: bool) -> SymMat<T>
+    {
+        if !mat.is_square()
+        {
+            panic!("Matrix must be square");
+        }
+
+        let mut diag = Vec::<T>::with_capacity(mat.num_cols);
+        for i in 0..mat.num_cols
+        {
+            diag.push(mat[(i, i)]);
+        }
+        let mut trig = Vec::<T>::with_capacity(get_symmat_len(mat.num_cols));
+        for i in 0..mat.num_rows
+        {
+            for j in 0..mat.num_cols
+            {
+                if upper
+                {
+                    if i < j
+                    {
+                        trig.push(mat[(i, j)]);
+                    }
+                } else {
+                    if j < i
+                    {
+                        trig.push(mat[(i, j)]);
+                    }                    
+                }
+            }
+        }
+        SymMat::<T>::new_from_vecs(diag, trig)        
+    }
+
+    // Creates a new Symmetric Matrix from the upper trigonal of a generic mat
+    pub fn new_from_upper_trig(mat: &Matrix<T>) -> SymMat<T>
+    {
+        SymMat::<T>::new_from_trig(mat, true)
+    }
+
+    // Creates a new Symmetric Matrix from the lower trigonal of a generic mat
+    pub fn new_from_lower_trig(mat: &Matrix<T>) -> SymMat<T>
+    {
+        SymMat::<T>::new_from_trig(mat, false)
     }
 
     /// Creates a new Symmetric Matrix filled with a given value
@@ -463,7 +572,7 @@ impl <T> SymMat<T> where T: Add + Sub + Copy + PartialEq
         SymMat::<T>::new_diag_with_fill(value, value, dims)
     }
 
-    /// lol
+    /// Converts the symmetric matrix into a regular matrix
     pub fn to_mat(&self) -> Matrix<T>
     {
         // Setup 'cutoff' vector for determining row index
@@ -484,6 +593,7 @@ impl <T> SymMat<T> where T: Add + Sub + Copy + PartialEq
         // Convert each k to an index and set the value in the matrix
         for k in 0..self.my_dat.len()
         {
+            // Determine which row we're in by which cutoff index we meet
             let mut i: i32 = 0;
             for z in 0..m
             {
@@ -496,6 +606,7 @@ impl <T> SymMat<T> where T: Add + Sub + Copy + PartialEq
         
             let j: i32 = ((i * i) - (2 * i * n) + (3 * i) + (2 * k as i32) + 2) / 2;
 
+            // Since it's symmetric we need to set both sides
             out_mat[(i as usize, j as usize)] = self.my_dat[k as usize];
             out_mat[(j as usize, i as usize)] = self.my_dat[k as usize];
         }
@@ -587,5 +698,94 @@ impl<T> PartialEq for SymMat<T> where T: Add + Sub + Copy + PartialEq
         }
 
         return true;
+    }
+}
+
+/// Implementation of the Add trait for symmetric matrices
+impl<T> Add for SymMat<T> where T: Add<Output=T> + Sub + Copy + PartialEq
+{
+    type Output = SymMat<T>;
+
+    fn add(self, other: SymMat<T>) -> SymMat<T>
+    {
+        if self.dims != other.dims
+        {
+            panic!("Cannot add two Matrices of different dimensions.");
+        }
+
+        fn add_two<'a, T>((a, b) : (&'a T, &'a T),) -> T
+            where T: Add<Output=T> + Sub + Copy + PartialEq
+        {
+            *a + *b
+        }
+        
+        // Make a zipped iterator containing (vec1[i], vec2[i]), then produce
+        // a map iterator which yields their sum, and collect into a new vec.
+        let my_vec = self.my_dat.iter().zip(other.my_dat.iter())
+            .map(add_two::<T>).collect::<Vec<T>>();
+        let my_diag = self.diag.iter().zip(other.diag.iter())
+            .map(add_two::<T>).collect::<Vec<T>>();
+
+        SymMat { my_dat: my_vec, diag: my_diag, .. self }
+    }
+}
+
+/// Implementation of the Sub trait
+impl<T> Sub for SymMat<T> where T: Add + Sub<Output=T> + Copy + PartialEq
+{
+    type Output = SymMat<T>;
+
+    fn sub(self, other: SymMat<T>) -> SymMat<T>
+    {
+        if self.dims != other.dims
+        {
+            panic!("Cannot add two Matrices of different dimensions.");
+        }
+
+        fn sub_two<'a, T>((a, b) : (&'a T, &'a T),) -> T
+            where T: Add + Sub<Output=T> + Copy + PartialEq
+        {
+            *a - *b
+        }
+        
+        // Make a zipped iterator containing (vec1[i], vec2[i]), then produce
+        // a map iterator which yields their sum, and collect into a new vec.
+        let my_vec = self.my_dat.iter().zip(other.my_dat.iter())
+            .map(sub_two::<T>).collect::<Vec<T>>();
+        let my_diag = self.diag.iter().zip(other.diag.iter())
+            .map(sub_two::<T>).collect::<Vec<T>>();
+
+        SymMat { my_dat: my_vec, diag: my_diag, .. self }
+    }
+}
+
+/// Enable tuple as indexing for symmetric matrices, e.g. m[(1, 2)]
+impl <T> Index<(usize, usize)> for SymMat<T>
+    where T: Add + Sub + Copy + PartialEq
+{
+    type Output = T;
+
+    fn index<'a>(&'a self, indices: (usize, usize)) -> &'a T
+    {
+        let (i, j) = indices;
+        return self.get(i, j);
+    }
+}
+
+/// Enable tuple as mutable indexing for symmetric matrices, e.g. m[(1, 2)] = 4
+impl <T> IndexMut<(usize, usize)> for SymMat<T>
+    where T: Add + Sub + Copy + PartialEq
+{
+    fn index_mut<'a>(&'a mut self, indices: (usize, usize)) -> &'a mut T
+    {
+        let (i, j) = indices;
+        if i > self.dims || j > self.dims
+        {
+            panic!("Indices out of bounds.");
+        } else if i == j {
+            &mut self.diag[i]
+        } else {
+            &mut self.my_dat[get_symmat_index(i, j, self.dims)]
+        }
     }
 }

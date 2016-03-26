@@ -200,6 +200,15 @@ mod test
     }
 
     #[test]
+    fn test_mat_debug()
+    {
+        let m1 = mat![[1, 2, 3],
+                      [4, 5, 6],
+                      [7, 8, 9]];
+        println!("{:?}", m1);
+    }
+
+    #[test]
     fn test_arr_dot_product_generic()
     {
         let a = arr![1, 2, 3];
@@ -263,6 +272,16 @@ mod test
                             [0f32, 0f32, 1f32]];
         let result = m1.to_mat();
         assert_eq!(expected, result);
+    }
+
+    #[test]
+    fn test_symmat_upper_trig()
+    {
+        let m1 = mat![[1f32, 2f32, 3f32],
+                      [0f32, 1f32, 4f32],
+                      [0f32, 0f32, 1f32]];
+        let sym = matrix::SymMat::<f32>::new_from_upper_trig(&m1);
+        assert_eq!(sym[(0,1)], m1[(0,1)]);
     }
 
     ///////////////////
