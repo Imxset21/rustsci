@@ -17,6 +17,7 @@ pub struct Matrix<T> where T: Add + Sub + Copy + PartialEq
 }
 
 /// Returns the dimensions of a vector of vectors as a two-tuple.
+#[inline]
 fn get_content_dims<T>(contents: &Vec<Vec<T>>) -> (usize, usize)
     where T: Add + Sub + Copy + PartialEq
 {
@@ -30,6 +31,7 @@ fn get_content_dims<T>(contents: &Vec<Vec<T>>) -> (usize, usize)
 }
 
 /// Validates whether all vectors in a vector of vectors are size-consistent.
+#[inline]
 fn validate_contents<T>(contents: &Vec<Vec<T>>) -> bool
     where T: Add + Sub + Copy + PartialEq
 {
@@ -107,10 +109,14 @@ impl<T> Sub for Matrix<T> where T: Add + Sub<Output=T> + Copy + PartialEq
 }
 
 /// Implementation of partial equality testing
-impl<T> PartialEq for Matrix<T> where T: Add<Output=T> + Sub + Copy + PartialEq
+impl<T> PartialEq for Matrix<T> where T: Add + Sub + Copy + PartialEq
 {
     fn eq(&self, other: &Matrix<T>) -> bool
     {
+        if self.num_cols != other.num_cols || self.num_rows != other.num_rows
+        {
+            panic!("Cannot compare Matrices of different dimensions.");
+        }
         // Using fold, though idiomatic, has average case of O(n).
         // Here we choose to use the standard for loop since avg. is O(log n)
         for (val1, val2) in self.my_dat.iter().zip(other.my_dat.iter())
@@ -131,6 +137,10 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
     /// Initialization method to create a Matrix from a vector of vectors.
     pub fn new(contents: Vec<Vec<T>>) -> Matrix<T>
     {
+        if contents.len() == 0
+        {
+            panic!("Matrix must have at least one element.");
+        }
         if !validate_contents(&contents)
         {
             panic!("Matrix contents are invalid: dimensions inconsistent.")
@@ -159,6 +169,10 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
     /// Creates a new Matrix filled with a given value, with given dimensions
     pub fn new_filled(value: T, num_rows: usize, num_cols: usize) -> Matrix<T>
     {
+        if num_rows == 0 || num_cols == 0
+        {
+            panic!("Matrix cannot have a zero dimension.");
+        }
         Matrix
         {
             my_dat: vec![value; num_rows * num_cols],
@@ -173,6 +187,10 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
                         num_rows: usize,
                         num_cols: usize) -> Matrix<T>
     {
+        if num_rows == 0 || num_cols == 0
+        {
+            panic!("Matrix cannot have a zero dimension.");
+        }
         if contents.len() % (num_rows * num_cols) != 0
         {
             panic!("Mismatch between matrix contents and dimensions.");
@@ -265,7 +283,7 @@ impl <T> Matrix<T> where T: Add + Sub + Copy + PartialEq
             panic!("Index out of bounds.");
         }
 
-        return &self.my_dat[(i * self.num_cols) + j];
+        &self.my_dat[(i * self.num_cols) + j]
     }
 
     /// Sets the value at the matrix's index coordinates.
@@ -344,7 +362,7 @@ impl <T> Mul for Matrix<T>
         let m = self.num_cols;
         let p = _rhs.num_cols;
 
-        // TODO: Rewrite as a series of folds, colletcs, etc.
+        // TODO: Rewrite as a series of folds, collects, etc.
         let mut toplevel: Vec<Vec<T>> = Vec::with_capacity(n);
         for i in 0..n
         {
@@ -394,13 +412,14 @@ macro_rules! mat
 #[derive(Debug, Clone)]
 pub struct SymMat<T> where T: Add + Sub + Copy + PartialEq
 {
-    diag: T,
+    diag: Vec<T>,
     my_dat: Vec<T>,
     col_order: bool,
     dims: usize,
 }
 
 /// Get the index of an element in a symmetric matrix based on its size
+#[inline(always)]
 fn get_symmat_index(mut i: usize, mut j: usize, n: usize) -> usize
 {
     // Swap indices if necessary to use upper-diagonal
@@ -411,10 +430,10 @@ fn get_symmat_index(mut i: usize, mut j: usize, n: usize) -> usize
         i = temp;
     }
 
-    return (i* n - (i- 1) * ((i- 1) + 1) / 2 + j - i) - (i+ 1);    
+    return (i * n - (i - 1) * ((i - 1) + 1) / 2 + j - i) - (i + 1);
 }
 
-/// Primary implementation of public methods for generic matrices
+/// Generic implementation of public methods for symmetric matrices
 impl <T> SymMat<T> where T: Add + Sub + Copy + PartialEq
 {
     /// Creates a symmetric matrix with diag on the diagonal, fill elsewhere
@@ -426,7 +445,7 @@ impl <T> SymMat<T> where T: Add + Sub + Copy + PartialEq
         }
         
         SymMat {
-            diag: diag,
+            diag: vec![diag; dims],
             my_dat: vec![fill; max(1, (1..dims).fold(0, |sum, x| sum + x))],
             col_order: true,
             dims: dims,
@@ -441,7 +460,55 @@ impl <T> SymMat<T> where T: Add + Sub + Copy + PartialEq
             panic!("Matrix must have at least one element.");
         }
         // Just a special case of new_diag_with_fill where diag == fill
-        return SymMat::<T>::new_diag_with_fill(value, value, dims);
+        SymMat::<T>::new_diag_with_fill(value, value, dims)
+    }
+
+    /// lol
+    pub fn to_mat(&self) -> Matrix<T>
+    {
+        // Setup 'cutoff' vector for determining row index
+        let n: i32 = self.dims as i32;
+        let m: usize = self.dims - 1;
+        let mut nums: Vec<i32> = vec![0; m];
+        let mut count: i32 = 0;
+        for z in 0..m
+        {
+            nums[z] = (n - 1) - z as i32;
+            count += nums[z];
+            nums[z] = count - 1;
+        }
+
+        // We can't fill with zeros, but we can fill with a diagonal!
+        let mut out_mat = Matrix::<T>::new_filled(self.diag[0], self.dims, self.dims);
+
+        // Convert each k to an index and set the value in the matrix
+        for k in 0..self.my_dat.len()
+        {
+            let mut i: i32 = 0;
+            for z in 0..m
+            {
+                if k as i32 <= nums[z as usize]
+                {
+                    i = z as i32;
+                    break;
+                }
+            }
+        
+            let j: i32 = ((i * i) - (2 * i * n) + (3 * i) + (2 * k as i32) + 2) / 2;
+
+            out_mat[(i as usize, j as usize)] = self.my_dat[k as usize];
+            out_mat[(j as usize, i as usize)] = self.my_dat[k as usize];
+        }
+
+        // Fill in matrix diagonals
+        let mut x: usize = 0;
+        for k in 0..self.diag.len()
+        {
+            out_mat[(x, x)] = self.diag[k as usize];
+            x += 1;
+        }
+
+        return out_mat;
     }
 
     /// The transpose of a symmetric matrix is itself
@@ -458,13 +525,13 @@ impl <T> SymMat<T> where T: Add + Sub + Copy + PartialEq
             panic!("Index out of bounds.");
         }
 
-        // Return the diagonal value
+        // Return the diagonal/upper trigonal value at the index
         if i == j
         {
-            return &self.diag;
+            &self.diag[i]
+        } else {
+            &self.my_dat[get_symmat_index(i, j, self.dims)]
         }
-
-        return &self.my_dat[get_symmat_index(i, j, self.dims)];
     }
 
     /// Sets the value at the matrix's index coordinates.
@@ -475,14 +542,13 @@ impl <T> SymMat<T> where T: Add + Sub + Copy + PartialEq
             panic!("Indices out of bounds.");
         }
         
-        // Set the diagonal
+        // Set the diagonal/upper trigonal value at the index
         if i == j
         {
-            self.diag = val;
-            return;
+            self.diag[i] = val;
+        } else {
+            self.my_dat[get_symmat_index(i, j, self.dims)] = val;
         }
-
-        self.my_dat[get_symmat_index(i, j, self.dims)] = val;
     }
 
     /// Gets the dimension of the matrix as a two-tuple (num_rows, num_cols).
@@ -490,16 +556,36 @@ impl <T> SymMat<T> where T: Add + Sub + Copy + PartialEq
     {
         (self.dims, self.dims)
     }
+}
 
-    /// Gets the underlying matrix data as a raw pointer.
-    pub unsafe fn as_ptr(&self) -> *const T
+/// Implementation of partial equality testing
+impl<T> PartialEq for SymMat<T> where T: Add + Sub + Copy + PartialEq
+{
+    fn eq(&self, other: &SymMat<T>) -> bool
     {
-        self.my_dat.as_ptr()
-    }
+        if self.dims != other.dims
+        {
+            panic!("Cannot compare matrices of different dimensions: {:0} vs {:1}",
+                   self.dims, other.dims);
+        }
+        // Using fold, though idiomatic, has average case of O(n).
+        // Here we choose to use the standard for loop since avg. is O(log n)
+        // We check the diagonal first because it's guaranteed to be smaller
+        for (val1, val2) in self.diag.iter().zip(other.diag.iter())
+        {
+            if *val1 != *val2
+            {
+                return false;
+            }
+        }
+        for (val1, val2) in self.my_dat.iter().zip(other.my_dat.iter())
+        {
+            if *val1 != *val2
+            {
+                return false;
+            }
+        }
 
-    /// Gets the underlying matrix data as a mutable pointer.
-    pub unsafe fn as_mut_ptr(&mut self) -> *mut T
-    {
-        self.my_dat.as_mut_ptr()
+        return true;
     }
 }

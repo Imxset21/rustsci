@@ -240,16 +240,29 @@ mod test
     fn test_symmat_new_diag_with_fill()
     {
         let m1 = matrix::SymMat::<f32>::new_diag_with_fill(1f32, 0f32, 3);
-        println!("{:?}", m1);
         let m2 = matrix::SymMat::<f32>::new_diag_with_fill(1f32, 0f32, 1);
-        println!("{:?}", m2);
+        // TODO: Finish test_symmat_new_diag_with_fill
+        assert!(m1 == m1);
+        assert!(m2 == m2);
     }
 
     #[test]
     fn test_symmat_new_filled()
     {
         let m1 = matrix::SymMat::<f32>::new_filled(1f32, 3);
-        println!("{:?}", m1);
+        // TOOD: Finish test_symmat_new_filled
+        assert!(m1 == m1);
+    }
+
+    #[test]
+    fn test_symmat_convert()
+    {
+        let m1 = matrix::SymMat::<f32>::new_diag_with_fill(1f32, 0f32, 3);
+        let expected = mat![[1f32, 0f32, 0f32],
+                            [0f32, 1f32, 0f32],
+                            [0f32, 0f32, 1f32]];
+        let result = m1.to_mat();
+        assert_eq!(expected, result);
     }
 
     ///////////////////
