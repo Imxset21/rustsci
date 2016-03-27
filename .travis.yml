@@ -17,6 +17,8 @@ addons:
     - libopenblas-dev
     - binutils-dev
     - libgsl0-dev
+    - libgsl0ldbl
+    - gsl-bin
 
 before_script:
   - pip install 'travis-cargo<0.2' --user && export PATH=$HOME/.local/bin:$PATH
