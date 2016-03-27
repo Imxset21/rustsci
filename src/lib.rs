@@ -8,6 +8,8 @@ extern crate libc;
 #[macro_use] pub mod matrix;
 pub mod lapacke;
 pub mod openblas;
+pub mod gsl_poly;
+pub mod gsl_math;
 
 #[cfg(test)]
 mod test
@@ -16,6 +18,8 @@ mod test
     use matrix;
     use lapacke;
     use openblas;
+    use gsl_poly;
+    use gsl_math;
     use std::mem;
 
     /////////////////
@@ -247,20 +251,30 @@ mod test
 
     #[test]
     fn test_symmat_new_diag_with_fill()
-    {
-        let m1 = matrix::SymMat::<f32>::new_diag_with_fill(1f32, 0f32, 3);
+    {        
         let m2 = matrix::SymMat::<f32>::new_diag_with_fill(1f32, 0f32, 1);
-        // TODO: Finish test_symmat_new_diag_with_fill
-        assert!(m1 == m1);
-        assert!(m2 == m2);
+        assert_eq!(m2[(0,0)], 1f32);
+        let m1 = matrix::SymMat::<f32>::new_diag_with_fill(1f32, 0f32, 3);
+        assert_eq!(m1[(0,0)], 1f32);
+        assert_eq!(m1[(0,1)], 0f32);
+        assert_eq!(m1[(0,2)], 0f32);
+        assert_eq!(m1[(1,0)], 0f32);
+        assert_eq!(m1[(1,1)], 1f32);
+        assert_eq!(m1[(1,2)], 0f32);
+        assert_eq!(m1[(2,0)], 0f32);
+        assert_eq!(m1[(2,1)], 0f32);
+        assert_eq!(m1[(2,2)], 1f32);
     }
 
     #[test]
     fn test_symmat_new_filled()
     {
         let m1 = matrix::SymMat::<f32>::new_filled(1f32, 3);
-        // TOOD: Finish test_symmat_new_filled
-        assert!(m1 == m1);
+        let m2 = mat![[1f32, 1f32, 1f32],
+                      [0f32, 1f32, 1f32],
+                      [0f32, 0f32, 1f32]];
+        let expected = matrix::SymMat::<f32>::new_from_upper_trig(&m2);
+        assert!(m1 == expected);
     }
 
     #[test]
@@ -299,6 +313,16 @@ mod test
                           [0., 0., 3.]];
         lapacke::cholesky_decomposition(&mut m);
         assert_eq!(m, result);
+    }
+
+    #[test]
+    fn test_bidiag_reduc()
+    {
+        let mut m = mat![[12f32, -51f32, 4f32],
+                         [6f32, 167f32, -68f32],
+                         [-4f32, 24f32, -41f32]];
+        lapacke::bidiagonal_reduction(&mut m);
+        // TODO: Finish testing bidiag_reduc
     }
 
     ////////////////////
@@ -435,7 +459,88 @@ mod test
         assert_eq!(c_mat, result_mat);
     
     }
-        
+
+    //////////////////////////
+    // GSL Polynomial Tests //
+    //////////////////////////
+
+    #[test]
+    fn test_poly_eval()
+    {
+        // f(x) = 1 + x + x^2
+        let c = arr![1f64, 1f64, 1f64];
+        let result = gsl_poly::poly_eval(&c, 1.0);
+        assert_eq!(result, 3f64);
+    }
+
+    #[test]
+    fn test_poly_eval_derivs()
+    {
+        // f(x) = 1 + x + x^2
+        let c = arr![1f64, 1f64, 1f64];
+        let result = gsl_poly::poly_eval_derivs(&c, 1.0, 1);
+        assert_eq!(result[0], 3f64);
+    }
+
+    #[test]
+    fn test_poly_divdiff_init()
+    {
+        let xa = arr![1f64, 2f64, 3f64];
+        let ya = arr![1f64, 2f64, 3f64];
+        let poly = gsl_poly::poly_divdiff_init(&xa, &ya);
+        assert_eq!(poly, arr![1f64, 1f64, 0f64]);
+    }
+
+    #[test]
+    fn test_poly_divdiff_eval()
+    {
+        let xa = arr![1f64, 2f64, 3f64];
+        let ya = arr![1f64, 2f64, 3f64];
+        let poly = gsl_poly::poly_divdiff_init(&xa, &ya);
+        let result = gsl_poly::poly_divdiff_eval(&poly, &xa, &ya, 1f64);
+        assert_eq!(1f64, result);
+    }
+
+    #[test]
+    fn test_poly_divdiff_to_taylor()
+    {
+        let xa = arr![1f64, 2f64, 3f64];
+        let ya = arr![1f64, 2f64, 3f64];
+        let poly = gsl_poly::poly_divdiff_init(&xa, &ya);
+        let taylor = gsl_poly::poly_divdiff_to_taylor(0f64, &poly, &xa);
+        assert_eq!(arr![0f64, 1f64, 0f64], taylor);
+    }
+
+    #[test]
+    fn test_poly_divdiff_to_hermite()
+    {
+        // TODO: Write test for Hermite polynomial
+    }
+
+    #[test]
+    fn test_poly_solve_quadratic()
+    {
+        let coeffs: [f64; 3] = [-4f64, -3f64, 1f64];
+        let roots = gsl_poly::poly_solve_quadratic(coeffs);
+        let y = match roots {
+            Some(x) => x,
+            None    => panic!("Test failed: no roots found"),
+        };
+        assert_eq!(y[0], -1f64);
+        assert_eq!(y[1], 0.25f64);
+    }
+
+    #[test]
+    fn test_poly_solve_cubic()
+    {
+        let coeffs: [f64; 3] = [-4f64, 1f64, 6f64];
+        let y = gsl_poly::poly_solve_cubic(coeffs);
+        assert!(gsl_math::gslmath_fcmp(y[0], -1f64, 0.001f64));
+        assert!(gsl_math::gslmath_fcmp(y[1], 2f64, 0.001f64));
+        assert!(gsl_math::gslmath_fcmp(y[2], 3f64, 0.001f64));
+    }
+
+    
 }
 
 
