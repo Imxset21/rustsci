@@ -10,6 +10,8 @@ pub mod lapacke;
 pub mod openblas;
 pub mod gsl_poly;
 pub mod gsl_math;
+pub mod gsl_sf;
+pub mod gsl_airy;
 
 #[cfg(test)]
 mod test
@@ -20,6 +22,7 @@ mod test
     use openblas;
     use gsl_poly;
     use gsl_math;
+    use gsl_airy;
     use std::mem;
 
     /////////////////
@@ -540,7 +543,16 @@ mod test
         assert!(gsl_math::gslmath_fcmp(y[2], 3f64, 0.001f64));
     }
 
-    
+    ///////////////////////////////////////
+    // Special Functions: Airy Functions //
+    ///////////////////////////////////////
+
+    #[test]
+    fn test_gslairy_ai()
+    {
+        let (val, _) = gsl_airy::gslairy_ai(1f64);
+        assert!(gsl_math::gslmath_fcmp(val, 0.13529241631288141f64, 0.001f64));
+    }
 }
 
 
