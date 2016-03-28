@@ -179,3 +179,18 @@ pub fn gslmath_fcmp(x: f64, y: f64, epsilon: f64) -> bool
         gsl_fcmp(x, y, epsilon) == 0
     }
 }
+
+/// Convenience macro for doing assert_eq using fcmp
+#[macro_export]
+macro_rules! assert_epeq {
+    ($left:expr , $right:expr, $epsilon:expr) => ({
+        match (&($left), &($right), &($epsilon)) {
+            (left_val, right_val, epsilon) => {
+                if !gsl_math::gslmath_fcmp(*left_val, *right_val, *epsilon) {
+                    panic!("assertion failed: `(left == right)` \
+                           (left: `{:?}`, right: `{:?}`)", left_val, right_val)
+                }
+            }
+        }
+    })
+}

@@ -362,7 +362,7 @@ extern
 }
 
 /// Regular Bessel Function J_0(x)
-pub fn gslbessel_j0r(x: f64) -> (f64, f64)
+pub fn bessel_j0r(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -376,7 +376,7 @@ pub fn gslbessel_j0r(x: f64) -> (f64, f64)
 
 /// Regular Bessel Function J_1(x)
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_j1r(x: f64) -> (f64, f64)
+pub fn bessel_j1r(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -390,7 +390,7 @@ pub fn gslbessel_j1r(x: f64) -> (f64, f64)
 
 /// Regular Bessel Function J_n(x)
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_jnr(n: i32, x: f64) -> (f64, f64)
+pub fn bessel_jnr(n: i32, x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -404,7 +404,7 @@ pub fn gslbessel_jnr(n: i32, x: f64) -> (f64, f64)
 
 /// Regular Bessel Function J_n(x),  nmin <= n <= nmax
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_jnr_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
+pub fn bessel_jnr_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
 {
     if nmin > nmax
     {
@@ -424,7 +424,7 @@ pub fn gslbessel_jnr_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
 /// Irregular Bessel function Y_0(x)
 /// x > 0.0
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_y0r(x: f64) -> (f64, f64)
+pub fn bessel_y0r(x: f64) -> (f64, f64)
 {
     if x <= 0.0
     {
@@ -481,7 +481,7 @@ pub fn gslbessel_ynr(n: i32, x: f64) -> (f64, f64)
 /// Irregular Bessel function Y_n(x), nmin <= n <= nmax
 /// x > 0.0
 /// exceptions: GSL_EDOM, GSL_EOVRFLW, GSL_EUNDRFLW
-pub fn gslbessel_ynr_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
+pub fn bessel_ynr_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
 {
     if nmin > nmax
     {
@@ -500,7 +500,7 @@ pub fn gslbessel_ynr_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
 
 /// Regular modified Bessel function I_0(x)
 /// exceptions: GSL_EOVRFLW
-pub fn gslbessel_i0r(x: f64) -> (f64, f64)
+pub fn bessel_i0r(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -514,7 +514,7 @@ pub fn gslbessel_i0r(x: f64) -> (f64, f64)
 
 /// Regular modified Bessel function I_1(x)
 /// exceptions: GSL_EOVRFLW, GSL_EUNDRFLW
-pub fn gslbessel_i1r(x: f64) -> (f64, f64)
+pub fn bessel_i1r(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -528,7 +528,7 @@ pub fn gslbessel_i1r(x: f64) -> (f64, f64)
 
 /// Regular modified Bessel function I_n(x)
 /// exceptions: GSL_EOVRFLW, GSL_EUNDRFLW
-pub fn gslbessel_inr(n: i32, x: f64) -> (f64, f64)
+pub fn bessel_inr(n: i32, x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -543,7 +543,7 @@ pub fn gslbessel_inr(n: i32, x: f64) -> (f64, f64)
 /// Regular modified Bessel function  I_n(x) for n=nmin,...,nmax
 /// nmin >=0, nmax >= nmin
 /// exceptions: GSL_EDOM, GSL_EOVRFLW, GSL_EUNDRFLW
-pub fn gslbessel_inr_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
+pub fn bessel_inr_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
 {
     if nmin > nmax
     {
@@ -563,7 +563,7 @@ pub fn gslbessel_inr_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
 /// Scaled regular modified Bessel function
 ///  exp(-|x|) I_0(x)
 /// exceptions: none
-pub fn gslbessel_i0r_scaled(x: f64) -> (f64, f64)
+pub fn bessel_i0r_scaled(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -578,7 +578,7 @@ pub fn gslbessel_i0r_scaled(x: f64) -> (f64, f64)
 /// Scaled regular modified Bessel function
 ///  exp(-|x|) I_1(x)
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_i1r_scaled(x: f64) -> (f64, f64)
+pub fn bessel_i1r_scaled(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -593,7 +593,7 @@ pub fn gslbessel_i1r_scaled(x: f64) -> (f64, f64)
 /// Scaled regular modified Bessel function
 ///  exp(-|x|) I_n(x)
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_inr_scaled(n: i32, x: f64) -> (f64, f64)
+pub fn bessel_inr_scaled(n: i32, x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -609,7 +609,7 @@ pub fn gslbessel_inr_scaled(n: i32, x: f64) -> (f64, f64)
 ///  exp(-|x|) I_n(x)  for n=nmin,...,nmax
 /// nmin >=0, nmax >= nmin
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_inr_scaled_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
+pub fn bessel_inr_scaled_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
 {
     if nmin > nmax
     {
@@ -633,7 +633,7 @@ pub fn gslbessel_inr_scaled_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
 /// Irregular modified Bessel function K_0(x)
 /// x > 0.0
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_k0i(x: f64) -> (f64, f64)
+pub fn bessel_k0i(x: f64) -> (f64, f64)
 {
     if x <= 0.0
     {
@@ -652,7 +652,7 @@ pub fn gslbessel_k0i(x: f64) -> (f64, f64)
 /// Irregular modified Bessel function K_1(x)
 /// x > 0.0
 /// exceptions: GSL_EDOM, GSL_EOVRFLW, GSL_EUNDRFLW
-pub fn gslbessel_k1i(x: f64) -> (f64, f64)
+pub fn bessel_k1i(x: f64) -> (f64, f64)
 {
     if x <= 0.0
     {
@@ -671,7 +671,7 @@ pub fn gslbessel_k1i(x: f64) -> (f64, f64)
 /// Irregular modified Bessel function K_n(x)
 /// x > 0.0
 /// exceptions: GSL_EDOM, GSL_EOVRFLW, GSL_EUNDRFLW
-pub fn gslbessel_kni(n: i32, x: f64) -> (f64, f64)
+pub fn bessel_kni(n: i32, x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -686,7 +686,7 @@ pub fn gslbessel_kni(n: i32, x: f64) -> (f64, f64)
 /// Irregular modified Bessel function  K_n(x)  for n=nmin,...,nmax
 /// x > 0.0, nmin >=0, nmax >= nmin
 /// exceptions: GSL_EDOM, GSL_EOVRFLW, GSL_EUNDRFLW
-pub fn gslbessel_nn_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
+pub fn bessel_nn_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
 {
     if nmin > nmax
     {
@@ -707,7 +707,7 @@ pub fn gslbessel_nn_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
 ///  exp(x) K_0(x)
 /// x > 0.0
 /// exceptions: GSL_EDOM
-pub fn gslbessel_k0i_scaled(x: f64) -> (f64, f64)
+pub fn bessel_k0i_scaled(x: f64) -> (f64, f64)
 {
     if x <= 0.0
     {
@@ -727,7 +727,7 @@ pub fn gslbessel_k0i_scaled(x: f64) -> (f64, f64)
 ///  exp(x) K_1(x)
 /// x > 0.0
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_k1i_scaled(x: f64) -> (f64, f64)
+pub fn bessel_k1i_scaled(x: f64) -> (f64, f64)
 {
     if x <= 0.0
     {
@@ -747,7 +747,7 @@ pub fn gslbessel_k1i_scaled(x: f64) -> (f64, f64)
 ///  exp(x) K_n(x)
 /// x > 0.0
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_kni_scaled(n: i32, x: f64) -> (f64, f64)
+pub fn bessel_kni_scaled(n: i32, x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -762,7 +762,7 @@ pub fn gslbessel_kni_scaled(n: i32, x: f64) -> (f64, f64)
 /// Scaled irregular modified Bessel function  exp(x) K_n(x)  for n=nmin,...,nmax
 /// x > 0.0, nmin >=0, nmax >= nmin
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_kni_scaled_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
+pub fn bessel_kni_scaled_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
 {
     if nmin > nmax
     {
@@ -780,7 +780,7 @@ pub fn gslbessel_kni_scaled_array(nmin: i32, nmax: i32, x: f64) -> Array<f64>
 }
 
 /// Regular spherical Bessel function j_0(x) = sin(x)/x
-pub fn gslbessel_j0i(x: f64) -> (f64, f64)
+pub fn bessel_j0i(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -794,7 +794,7 @@ pub fn gslbessel_j0i(x: f64) -> (f64, f64)
 
 /// Regular spherical Bessel function j_1(x) = (sin(x)/x - cos(x))/x
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_j1i(x: f64) -> (f64, f64)
+pub fn bessel_j1i(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -808,7 +808,7 @@ pub fn gslbessel_j1i(x: f64) -> (f64, f64)
 
 /// Regular spherical Bessel function j_2(x) = ((3/x^2 - 1)sin(x) - 3cos(x)/x)/x
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_j2i(x: f64) -> (f64, f64)
+pub fn bessel_j2i(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -823,7 +823,7 @@ pub fn gslbessel_j2i(x: f64) -> (f64, f64)
 /// Regular spherical Bessel function j_l(x)
 /// l >= 0, x >= 0.0
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_jli(l: i32, x: f64) -> (f64, f64)
+pub fn bessel_jli(l: i32, x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -837,7 +837,7 @@ pub fn gslbessel_jli(l: i32, x: f64) -> (f64, f64)
 
 /// Regular spherical Bessel function j_l(x) for l=0,1,...,lmax
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_jl_array(lmax: usize, x: f64) -> Array<f64>
+pub fn bessel_jl_array(lmax: usize, x: f64) -> Array<f64>
 {
     let mut result_array = Array::<f64>::new_filled(0f64, lmax, Order::Row);
     unsafe {
@@ -852,7 +852,7 @@ pub fn gslbessel_jl_array(lmax: usize, x: f64) -> Array<f64>
 /// Regular spherical Bessel function j_l(x) for l=0,1,...,lmax
 /// Uses Steed's method.
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_jlr_steed_array(lmax: usize, x: f64) -> Array<f64>
+pub fn bessel_jlr_steed_array(lmax: usize, x: f64) -> Array<f64>
 {
     let mut result_array = Array::<f64>::new_filled(0f64, lmax, Order::Row);
     unsafe {
@@ -865,7 +865,7 @@ pub fn gslbessel_jlr_steed_array(lmax: usize, x: f64) -> Array<f64>
 }
 
 /// Irregular spherical Bessel function y_0(x)
-pub fn gslbessel_y0i(x: f64) -> (f64, f64)
+pub fn bessel_y0i(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -879,7 +879,7 @@ pub fn gslbessel_y0i(x: f64) -> (f64, f64)
 
 /// Irregular spherical Bessel function y_1(x)
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_y1i(x: f64) -> (f64, f64)
+pub fn bessel_y1i(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -893,7 +893,7 @@ pub fn gslbessel_y1i(x: f64) -> (f64, f64)
 
 /// Irregular spherical Bessel function y_2(x)
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_y2i(x: f64) -> (f64, f64)
+pub fn bessel_y2i(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -907,7 +907,7 @@ pub fn gslbessel_y2i(x: f64) -> (f64, f64)
 
 /// Irregular spherical Bessel function y_l(x)
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_yli(l: i32, x: f64) -> (f64, f64)
+pub fn bessel_yli(l: i32, x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -921,7 +921,7 @@ pub fn gslbessel_yli(l: i32, x: f64) -> (f64, f64)
 
 /// Irregular spherical Bessel function y_l(x) for l=0,1,...,lmax
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_yli_array(lmax: usize, x: f64) -> Array<f64>
+pub fn bessel_yli_array(lmax: usize, x: f64) -> Array<f64>
 {
     let mut result_array = Array::<f64>::new_filled(0f64, lmax, Order::Row);
     unsafe {
@@ -936,7 +936,7 @@ pub fn gslbessel_yli_array(lmax: usize, x: f64) -> Array<f64>
 /// Regular scaled modified spherical Bessel function
 /// Exp[-|x|] i_0(x)
 /// exceptions: none
-pub fn gslbessel_i0_scaled(x: f64) -> (f64, f64)
+pub fn bessel_i0_scaled(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -951,7 +951,7 @@ pub fn gslbessel_i0_scaled(x: f64) -> (f64, f64)
 /// Regular scaled modified spherical Bessel function
 /// Exp[-|x|] i_1(x)
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_i1_scaled(x: f64) -> (f64, f64)
+pub fn bessel_i1_scaled(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -966,7 +966,7 @@ pub fn gslbessel_i1_scaled(x: f64) -> (f64, f64)
 /// Regular scaled modified spherical Bessel function
 /// Exp[-|x|] i_2(x)
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_i2_scaled(x: f64) -> (f64, f64)
+pub fn bessel_i2_scaled(x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -983,7 +983,7 @@ pub fn gslbessel_i2_scaled(x: f64) -> (f64, f64)
 /// i_l(x) = Sqrt[Pi/(2x)] BesselI[l+1/2,x]
 /// l >= 0
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_il_scaled(l: i32, x: f64) -> (f64, f64)
+pub fn bessel_il_scaled(l: i32, x: f64) -> (f64, f64)
 {
     if l < 0
     {
@@ -1003,7 +1003,7 @@ pub fn gslbessel_il_scaled(l: i32, x: f64) -> (f64, f64)
 /// Exp[-|x|] i_l(x)
 /// for l=0,1,...,lmax
 /// exceptions: GSL_EUNDRFLW
-pub fn gslbessel_il_scaled_array(lmax: usize, x: f64) -> Array<f64>
+pub fn bessel_il_scaled_array(lmax: usize, x: f64) -> Array<f64>
 {
     let mut result_array = Array::<f64>::new_filled(0f64, lmax, Order::Row);
     unsafe {
@@ -1019,7 +1019,7 @@ pub fn gslbessel_il_scaled_array(lmax: usize, x: f64) -> Array<f64>
 /// Exp[x] k_0(x)
 /// x > 0.0
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_k0_scaled(x: f64) -> (f64, f64)
+pub fn bessel_k0_scaled(x: f64) -> (f64, f64)
 {
     if x <= 0.0
     {
@@ -1039,7 +1039,7 @@ pub fn gslbessel_k0_scaled(x: f64) -> (f64, f64)
 /// Exp[x] k_1(x)
 /// x > 0.0
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW, GSL_EOVRFLW
-pub fn gslbessel_k1_scaled(x: f64) -> (f64, f64)
+pub fn bessel_k1_scaled(x: f64) -> (f64, f64)
 {
     if x <= 0.0
     {
@@ -1059,7 +1059,7 @@ pub fn gslbessel_k1_scaled(x: f64) -> (f64, f64)
 /// Exp[x] k_2(x)
 /// x > 0.0
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW, GSL_EOVRFLW
-pub fn gslbessel_k2_scaled(x: f64) -> (f64, f64)
+pub fn bessel_k2_scaled(x: f64) -> (f64, f64)
 {
     if x <= 0.0
     {
@@ -1079,7 +1079,7 @@ pub fn gslbessel_k2_scaled(x: f64) -> (f64, f64)
 /// Exp[x] k_l[x]
 /// k_l(x) = Sqrt[Pi/(2x)] BesselK[l+1/2,x]
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_kl_scaled(l: i32, x: f64) -> (f64, f64)
+pub fn bessel_kl_scaled(l: i32, x: f64) -> (f64, f64)
 {
     if l < 0
     {
@@ -1099,7 +1099,7 @@ pub fn gslbessel_kl_scaled(l: i32, x: f64) -> (f64, f64)
 /// Exp[x] k_l(x)
 /// for l=0,1,...,lmax
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_kl_scaled_array(lmax: usize, x: f64) -> Array<f64>
+pub fn bessel_kl_scaled_array(lmax: usize, x: f64) -> Array<f64>
 {
     let mut result_arr = Array::<f64>::new_filled(0f64, lmax, Order::Row);
     unsafe {
@@ -1114,7 +1114,7 @@ pub fn gslbessel_kl_scaled_array(lmax: usize, x: f64) -> Array<f64>
 
 /// Regular cylindrical Bessel function J_nu(x)
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_jnur(nu: f64, x: f64) -> (f64, f64)
+pub fn bessel_jnur(nu: f64, x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -1127,7 +1127,7 @@ pub fn gslbessel_jnur(nu: f64, x: f64) -> (f64, f64)
 }
 
 /// Irregular cylindrical Bessel function Y_nu(x)
-pub fn gslbessel_ynui(nu: f64, x: f64) -> (f64, f64)
+pub fn bessel_ynui(nu: f64, x: f64) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -1145,7 +1145,7 @@ pub fn gslbessel_ynui(nu: f64, x: f64) -> (f64, f64)
 /// strictly ordered and positive. The array is
 /// over-written with the values of J_nu(x_i).
 /// exceptions: GSL_EDOM, GSL_EINVAL
-pub fn gslbessel_sequence_jnur(nu: f64, v: &Array<f64>) -> Array<f64>
+pub fn bessel_sequence_jnur(nu: f64, v: &Array<f64>) -> Array<f64>
 {
     let mut _v = v.clone();
 
@@ -1164,7 +1164,7 @@ pub fn gslbessel_sequence_jnur(nu: f64, v: &Array<f64>) -> Array<f64>
 /// Exp[-|x|] BesselI[nu, x]
 /// x >= 0, nu >= 0
 /// exceptions: GSL_EDOM
-pub fn gslbessel_inu_scaled(nu: f64, x: f64) -> (f64, f64)
+pub fn bessel_inu_scaled(nu: f64, x: f64) -> (f64, f64)
 {
     if x < 0f64 || nu < 0f64
     {
@@ -1184,7 +1184,7 @@ pub fn gslbessel_inu_scaled(nu: f64, x: f64) -> (f64, f64)
 /// BesselI[nu, x]
 /// x >= 0, nu >= 0
 /// exceptions: GSL_EDOM, GSL_EOVRFLW
-pub fn gslbessel_inu(nu: f64, x: f64) -> (f64, f64)
+pub fn bessel_inu(nu: f64, x: f64) -> (f64, f64)
 {
     if x < 0f64 || nu < 0f64
     {
@@ -1204,7 +1204,7 @@ pub fn gslbessel_inu(nu: f64, x: f64) -> (f64, f64)
 /// Exp[+|x|] BesselK[nu, x]
 /// x > 0, nu >= 0
 /// exceptions: GSL_EDOM
-pub fn gslbessel_knu_scaled(nu: f64, x: f64) -> (f64, f64)
+pub fn bessel_knu_scaled(nu: f64, x: f64) -> (f64, f64)
 {
     if x < 0f64 || nu < 0f64
     {
@@ -1224,7 +1224,7 @@ pub fn gslbessel_knu_scaled(nu: f64, x: f64) -> (f64, f64)
 /// BesselK[nu, x]
 /// x > 0, nu >= 0
 /// exceptions: GSL_EDOM, GSL_EUNDRFLW
-pub fn gslbessel_knu(nu: f64, x: f64) -> (f64, f64)
+pub fn bessel_knu(nu: f64, x: f64) -> (f64, f64)
 {
     if x <= 0f64 || nu < 0f64
     {
@@ -1244,7 +1244,7 @@ pub fn gslbessel_knu(nu: f64, x: f64) -> (f64, f64)
 /// Log[BesselK[nu, x]]
 /// x > 0, nu >= 0
 /// exceptions: GSL_EDOM
-pub fn gslbessel_lnknu(nu: f64, x: f64) -> (f64, f64)
+pub fn bessel_lnknu(nu: f64, x: f64) -> (f64, f64)
 {
     if x <= 0f64 || nu < 0f64
     {
@@ -1261,7 +1261,7 @@ pub fn gslbessel_lnknu(nu: f64, x: f64) -> (f64, f64)
 }
 
 /// n'th positive zero of the Bessel function J_0(x).
-pub fn gslbessel_zero_j0(n: u32) -> (f64, f64)
+pub fn bessel_zero_j0(n: u32) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -1274,7 +1274,7 @@ pub fn gslbessel_zero_j0(n: u32) -> (f64, f64)
 }
 
 /// n'th positive zero of the Bessel function J_1(x).
-pub fn gslbessel_zero_j1(n: u32) -> (f64, f64)
+pub fn bessel_zero_j1(n: u32) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {
@@ -1287,7 +1287,7 @@ pub fn gslbessel_zero_j1(n: u32) -> (f64, f64)
 }
 
 /// n'th positive zero of the Bessel function J_nu(x).
-pub fn gslbessel_zero_jnu(nu: f64, n: u32) -> (f64, f64)
+pub fn bessel_zero_jnu(nu: f64, n: u32) -> (f64, f64)
 {
     let mut s = gsl_sf::gsl_sf_result_struct{val: 0f64, err: 0f64};
     unsafe {

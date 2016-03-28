@@ -197,13 +197,9 @@ pub fn poly_divdiff_init(xa: &Array<f64>, ya: &Array<f64>) -> Array<f64>
 }
 
 // Evaluates the divided-difference polynomial at x
-pub fn poly_divdiff_eval(
-    dd: &Array<f64>,
-    xa: &Array<f64>,
-    ya: &Array<f64>,
-    x: f64) -> f64
+pub fn poly_divdiff_eval(dd: &Array<f64>, xa: &Array<f64>, x: f64) -> f64
 {
-    if xa.len() != ya.len() || dd.len() != xa.len()
+    if dd.len() != xa.len()
     {
         panic!("Inconsistent sizes for xa, ya, dd");
     }
@@ -268,6 +264,10 @@ pub fn poly_divdiff_to_hermite(
 
     return (dd, za);
 }
+
+//////////////////////
+// Quadratic Solver //
+//////////////////////
 
 // Finds the real roots of the quadratic equation a*x^2 + b*x + c = 0
 pub fn poly_solve_quadratic(coeffs: [f64; 3]) -> Option<Vec<f64>>

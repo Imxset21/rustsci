@@ -9,7 +9,7 @@ extern crate libc;
 pub mod lapacke;
 pub mod openblas;
 pub mod gsl_poly;
-pub mod gsl_math;
+#[macro_use] pub mod gsl_math;
 pub mod gsl_sf;
 pub mod gsl_airy;
 pub mod gsl_bessel;
@@ -501,7 +501,7 @@ mod test
         let xa = arr![1f64, 2f64, 3f64];
         let ya = arr![1f64, 2f64, 3f64];
         let poly = gsl_poly::poly_divdiff_init(&xa, &ya);
-        let result = gsl_poly::poly_divdiff_eval(&poly, &xa, &ya, 1f64);
+        let result = gsl_poly::poly_divdiff_eval(&poly, &xa, 1f64);
         assert_eq!(1f64, result);
     }
 

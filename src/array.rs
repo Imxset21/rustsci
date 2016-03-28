@@ -56,7 +56,7 @@ impl<T> Array<T> where T: Add + Sub + Copy + PartialEq
     }
 
     /// Returns a slice (in-memory view) of the entire array
-    fn as_slice(&self) -> &[T]
+    pub fn as_slice(&self) -> &[T]
     {
         return self.my_vec.as_slice();
     }
@@ -64,9 +64,47 @@ impl<T> Array<T> where T: Add + Sub + Copy + PartialEq
     /// Returns an iterator over size elements of the slice at a time. The
     /// chunks do not overlap. If size does not divide the length of the slice,
     /// then the last chunk will not have length size.
-    fn chunks(&self, size: usize) -> slice::Chunks<T>
+    pub fn chunks(&self, size: usize) -> slice::Chunks<T>
     {
         return self.my_vec.chunks(size);
+    }
+}
+
+/// Implementation of the IntoIterator trait, which consumes the array
+impl<T> IntoIterator for Array<T> where T: Add + Sub + Copy + PartialEq
+{
+    type Item = T;
+    type IntoIter = ::std::vec::IntoIter<T>;
+
+    #[inline]
+    fn into_iter(self) -> Self::IntoIter
+    {
+        self.my_vec.into_iter()
+    }
+}
+
+/// Implementation of the IntoIterator trait, which borrows the array
+impl<'a, T> IntoIterator for &'a Array<T> where T: Add + Sub + Copy + PartialEq
+{
+    type Item = &'a T;
+    type IntoIter = ::std::slice::Iter<'a, T>;
+
+    #[inline]
+    fn into_iter(self) -> ::std::slice::Iter<'a, T>
+    {
+        self.my_vec.iter()
+    }
+}
+
+/// Implementation of the IntoIterator trait, which borrows the array mutably
+impl<'a, T> IntoIterator for &'a mut Array<T> where T: Add + Sub + Copy + PartialEq
+{
+    type Item = &'a mut T;
+    type IntoIter = ::std::slice::IterMut<'a, T>;
+
+    fn into_iter(mut self) -> ::std::slice::IterMut<'a, T>
+    {
+        self.my_vec.iter_mut()
     }
 }
 
