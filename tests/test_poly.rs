@@ -20,7 +20,7 @@ fn test_3_poly()
 }
 
 #[test]
-pub fn test_11_poly()
+fn test_11_poly()
 {
     let d = arr![1., -1., 1., -1., 1., -1., 1., -1., 1., -1., 1.];
     let x: f64 = 1.0;
@@ -30,7 +30,7 @@ pub fn test_11_poly()
 
 // Quadratic
 #[test]
-pub fn test_quadratic_solve_1()
+fn test_quadratic_solve_1()
 {
     match gsl_poly::poly_solve_quadratic([4.0, -20.0, 26.0]) {
         None => (),
@@ -39,7 +39,7 @@ pub fn test_quadratic_solve_1()
 }
 
 #[test]
-pub fn test_quadratic_solve_2()
+fn test_quadratic_solve_2()
 {
     let (x0, x1) = match gsl_poly::poly_solve_quadratic([4.0, -20.0, 25.0]) {
         None => panic!("Quadratic test failed: invalid number of roots"),
@@ -52,7 +52,7 @@ pub fn test_quadratic_solve_2()
 }
 
 #[test]
-pub fn test_quadratic_solve_3()
+fn test_quadratic_solve_3()
 {
     let (x0, x1) = match gsl_poly::poly_solve_quadratic([4.0, -20.0, 21.0]) {
         None => panic!("Quadratic test failed: invalid number of roots"),
@@ -64,7 +64,7 @@ pub fn test_quadratic_solve_3()
 }
 
 #[test]
-pub fn test_quadratic_solve_4()
+fn test_quadratic_solve_4()
 {
     let (x0, x1) = match gsl_poly::poly_solve_quadratic([4.0, 7.0, 0.0]) {
         None => panic!("Quadratic test failed: invalid number of roots"),
@@ -76,7 +76,7 @@ pub fn test_quadratic_solve_4()
 }
 
 #[test]
-pub fn test_quadratic_solve_5()
+fn test_quadratic_solve_5()
 {
     let (x0, x1) = match gsl_poly::poly_solve_quadratic([5.0, 0.0, -20.0]) {
         None => panic!("Quadratic test failed: invalid number of roots"),
@@ -88,7 +88,7 @@ pub fn test_quadratic_solve_5()
 }
 
 #[test]
-pub fn test_quadratic_solve_6()
+fn test_quadratic_solve_6()
 {
     let x0 = match gsl_poly::poly_solve_quadratic([0.0, 3.0, -21.0]) {
         None => panic!("Quadratic test failed: invalid number of roots"),
@@ -99,7 +99,7 @@ pub fn test_quadratic_solve_6()
 }
 
 #[test]
-pub fn test_quadratic_solve_7()
+fn test_quadratic_solve_7()
 {
     match gsl_poly::poly_solve_quadratic([0.0, 0.0, 1.0]) {
         None => (),
@@ -113,7 +113,7 @@ pub fn test_quadratic_solve_7()
 ///////////
 
 #[test]
-pub fn test_cubic_solve_1()
+fn test_cubic_solve_1()
 {
     let roots = gsl_poly::poly_solve_cubic([0.0, 0.0, -27.0]);
 
@@ -122,7 +122,7 @@ pub fn test_cubic_solve_1()
 }
 
 #[test]
-pub fn test_cubic_solve_2()
+fn test_cubic_solve_2()
 {
     let roots = gsl_poly::poly_solve_cubic([-51.0, 867.0, -4913.0]);
 
@@ -133,7 +133,7 @@ pub fn test_cubic_solve_2()
 }
 
 #[test]
-pub fn test_cubic_solve_3()
+fn test_cubic_solve_3()
 {
     let roots = gsl_poly::poly_solve_cubic([-57.0, 1071.0, -6647.0]);
 
@@ -144,7 +144,7 @@ pub fn test_cubic_solve_3()
 }
 
 #[test]
-pub fn test_cubic_solve_4()
+fn test_cubic_solve_4()
 {
     let roots = gsl_poly::poly_solve_cubic([-11.0, -493.0, 6647.0]);
 
@@ -155,7 +155,7 @@ pub fn test_cubic_solve_4()
 }
 
 #[test]
-pub fn test_cubic_solve_5()
+fn test_cubic_solve_5()
 {
     let roots = gsl_poly::poly_solve_cubic([-143.0, 5087.0, -50065.0]);
 
@@ -166,7 +166,7 @@ pub fn test_cubic_solve_5()
 }
 
 #[test]
-pub fn test_cubic_solve_6()
+fn test_cubic_solve_6()
 {
     let roots = gsl_poly::poly_solve_cubic([-109.0, 803.0, 50065.0]);
 
@@ -179,7 +179,7 @@ pub fn test_cubic_solve_6()
 // DD Polynomials
 
 #[test]
-pub fn test_dd_eval_1()
+fn test_dd_eval_1()
 {
     let xa = arr![0.16, 0.97, 1.94, 2.74, 3.58, 3.73, 4.70];
     let ya = arr![0.73, 1.11, 1.49, 1.84, 2.30, 2.41, 3.07];
@@ -217,7 +217,7 @@ pub fn test_dd_eval_1()
 
 #[test]
 #[ignore]
-pub fn test_dd_eval_2()
+fn test_dd_eval_2()
 {
     // TODO: Find out why this isn't working
     let xa: array::Array<f64> = arr![1.3, 1.6, 1.9];
@@ -253,7 +253,7 @@ pub fn test_dd_eval_2()
 }
 
 #[test]
-pub fn test_poly_eval_derivs()
+fn test_poly_eval_derivs()
 {
     let c = arr![1.0, -2.0, 3.0, -4.0, 5.0, -6.0];
     let x = -0.5f64;
@@ -265,4 +265,76 @@ pub fn test_poly_eval_derivs()
     assert_epeq!(dc[3], 3.0*2.0*c[3] + 4.0*3.0*2.0*c[4]*x + 5.0*4.0*3.0*c[5]*x*x, EPS);
     assert_epeq!(dc[4], 4.0*3.0*2.0*c[4] + 5.0*4.0*3.0*2.0*c[5]*x, EPS);
     assert_epeq!(dc[5], 5.0*4.0*3.0*2.0*c[5], EPS);
+}
+
+// Miscellaneous tests
+
+#[test]
+fn test_poly_eval_misc()
+{
+    // f(x) = 1 + x + x^2
+    let c = arr![1f64, 1f64, 1f64];
+    let result = gsl_poly::poly_eval(&c, 1.0);
+    assert_eq!(result, 3f64);
+}
+
+#[test]
+fn test_poly_eval_derivs_misc()
+{
+    // f(x) = 1 + x + x^2
+    let c = arr![1f64, 1f64, 1f64];
+    let result = gsl_poly::poly_eval_derivs(&c, 1.0, 1);
+    assert_eq!(result[0], 3f64);
+}
+
+#[test]
+fn test_poly_divdiff_init()
+{
+    let xa = arr![1f64, 2f64, 3f64];
+    let ya = arr![1f64, 2f64, 3f64];
+    let poly = gsl_poly::poly_divdiff_init(&xa, &ya);
+    assert_eq!(poly, arr![1f64, 1f64, 0f64]);
+}
+
+#[test]
+fn test_poly_divdiff_eval()
+{
+    let xa = arr![1f64, 2f64, 3f64];
+    let ya = arr![1f64, 2f64, 3f64];
+    let poly = gsl_poly::poly_divdiff_init(&xa, &ya);
+    let result = gsl_poly::poly_divdiff_eval(&poly, &xa, 1f64);
+    assert_eq!(1f64, result);
+}
+
+#[test]
+fn test_poly_divdiff_to_taylor()
+{
+    let xa = arr![1f64, 2f64, 3f64];
+    let ya = arr![1f64, 2f64, 3f64];
+    let poly = gsl_poly::poly_divdiff_init(&xa, &ya);
+    let taylor = gsl_poly::poly_divdiff_to_taylor(0f64, &poly, &xa);
+    assert_eq!(arr![0f64, 1f64, 0f64], taylor);
+}
+
+#[test]
+fn test_poly_solve_quadratic()
+{
+    let coeffs: [f64; 3] = [-4f64, -3f64, 1f64];
+    let roots = gsl_poly::poly_solve_quadratic(coeffs);
+    let y = match roots {
+        Some(x) => x,
+        None    => panic!("Test failed: no roots found"),
+    };
+    assert_eq!(y[0], -1f64);
+    assert_eq!(y[1], 0.25f64);
+}
+
+#[test]
+fn test_poly_solve_cubic()
+{
+    let coeffs: [f64; 3] = [-4f64, 1f64, 6f64];
+    let y = gsl_poly::poly_solve_cubic(coeffs);
+    assert!(gsl_math::gslmath_fcmp(y[0], -1f64, 0.001f64));
+    assert!(gsl_math::gslmath_fcmp(y[1], 2f64, 0.001f64));
+    assert!(gsl_math::gslmath_fcmp(y[2], 3f64, 0.001f64));
 }
