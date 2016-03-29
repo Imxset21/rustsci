@@ -1,4 +1,4 @@
-/// Polynomial evaluation
+/// Polynomial evaluation testing
 #[macro_use]
 extern crate rustsci;
 
@@ -179,7 +179,7 @@ pub fn test_cubic_solve_6()
 // DD Polynomials
 
 #[test]
-pub fn test_dd_eval()
+pub fn test_dd_eval_1()
 {
     let xa = arr![0.16, 0.97, 1.94, 2.74, 3.58, 3.73, 4.70];
     let ya = arr![0.73, 1.11, 1.49, 1.84, 2.30, 2.41, 3.07];
@@ -215,54 +215,54 @@ pub fn test_dd_eval()
     }
 }
 
-/*
+#[test]
+#[ignore]
+pub fn test_dd_eval_2()
 {
-    size_t i;
-    double xa[3] = { 1.3, 1.6, 1.9 };
-    double ya[3] = { 0.6200860, 0.4554022, 0.2818186 };
-    double dya[3] = { -0.5220232, -0.5698959, -0.5811571 };
+    // TODO: Find out why this isn't working
+    let xa: array::Array<f64> = arr![1.3, 1.6, 1.9];
+    let ya: array::Array<f64> = arr![0.6200860, 0.4554022, 0.2818186];
+    let dya: array::Array<f64> = arr![-0.5220232, -0.5698959, -0.5811571];
 
-    double dd_expected[6] = {  6.200860000000e-01,
-                               -5.220232000000e-01,
-                               -8.974266666667e-02,
-                               6.636555555556e-02,
-                               2.666666666662e-03,
-                               -2.774691357989e-03 };
+    let dd_expected: array::Array<f64> =
+        arr![6.200860000000e-01,
+             -5.220232000000e-01,
+             -8.974266666667e-02,
+             6.636555555556e-02,
+             2.666666666662e-03,
+             -2.774691357989e-03];
 
-    double dd[6], za[6], coeff[6], work[6];
-
-    gsl_poly_dd_hermite_init(dd, za, xa, ya, dya, 3);
-
-    for (i = 0; i < 6; i++)
+    let (dd, za) = gsl_poly::poly_divdiff_to_hermite(&xa, &ya, &dya);
+    println!("{:?}", za);
+    for (dd_v, dd_e) in (&dd).into_iter().zip((&dd_expected).into_iter())
     {
-        assert_epeq!(dd[i], dd_expected[i], 1e-10, "hermite divided difference dd[%d]", i);
+        assert_epeq!(*dd_v, *dd_e, 1e-10);
     }
 
-    for (i = 0; i < 3; i++)
+    for (xa_i, ya_i) in (&xa).into_iter().zip((&ya).into_iter())
     {
-        double y = gsl_poly_dd_eval(dd, za, 6, xa[i]);
-        assert_epeq!(y, ya[i], 1e-10, "hermite divided difference y[%d]", i);
+        let y = gsl_poly::poly_divdiff_eval(&dd, &za, *xa_i);
+        assert_epeq!(y, *ya_i, 1e-10);
     }
 
-    for (i = 0; i < 3; i++)
+    for (xa_i, dya_i) in (&xa).into_iter().zip((&dya).into_iter())
     {
-        gsl_poly_dd_taylor(coeff, xa[i], dd, za, 6, work);
-        assert_epeq!(coeff[1], dya[i], 1e-10, "hermite divided difference dy/dx[%d]", i);
+        let coeff = gsl_poly::poly_divdiff_to_taylor(*xa_i, &dd, &za);
+        assert_epeq!(coeff[1], *dya_i, 1e-10);
     }
 }
 
+#[test]
+pub fn test_poly_eval_derivs()
 {
-    double c[6] = { +1.0, -2.0, +3.0, -4.0, +5.0, -6.0 };
-    double dc[6];
-    double x;
-    x = -0.5;
-    gsl_poly_eval_derivs(c, 6, x, dc, 6);
+    let c = arr![1.0, -2.0, 3.0, -4.0, 5.0, -6.0];
+    let x = -0.5f64;
+    let dc = gsl_poly::poly_eval_derivs(&c, x, 6);
 
-    assert_epeq!(dc[0], c[0] + c[1]*x + c[2]*x*x + c[3]*x*x*x + c[4]*x*x*x*x + c[5]*x*x*x*x*x , eps, "gsl_poly_eval_derivs({+1, -2, +3, -4, +5, -6}, 3.75)");
-    assert_epeq!(dc[1], c[1] + 2.0*c[2]*x + 3.0*c[3]*x*x + 4.0*c[4]*x*x*x + 5.0*c[5]*x*x*x*x , eps, "gsl_poly_eval_derivs({+1, -2, +3, -4, +5, -6} deriv 1, -12.375)");
-    assert_epeq!(dc[2], 2.0*c[2] + 3.0*2.0*c[3]*x + 4.0*3.0*c[4]*x*x + 5.0*4.0*c[5]*x*x*x , eps, "gsl_poly_eval_derivs({+1, -2, +3, -4, +5, -6} deriv 2, +48.0)");
-    assert_epeq!(dc[3], 3.0*2.0*c[3] + 4.0*3.0*2.0*c[4]*x + 5.0*4.0*3.0*c[5]*x*x , eps,"gsl_poly_eval_derivs({+1, -2, +3, -4, +5, -6} deriv 3, -174.0)");
-    assert_epeq!(dc[4], 4.0*3.0*2.0*c[4] + 5.0*4.0*3.0*2.0*c[5]*x, eps, "gsl_poly_eval_derivs({+1, -2, +3, -4, +5, -6} deriv 4, +480.0)");
-    assert_epeq!(dc[5], 5.0*4.0*3.0*2.0*c[5] , eps, "gsl_poly_eval_derivs({+1, -2, +3, -4, +5, -6} deriv 5, -720.0)");
+    assert_epeq!(dc[0], c[0] + c[1]*x + c[2]*x*x + c[3]*x*x*x + c[4]*x*x*x*x + c[5]*x*x*x*x*x, EPS);
+    assert_epeq!(dc[1], c[1] + 2.0*c[2]*x + 3.0*c[3]*x*x + 4.0*c[4]*x*x*x + 5.0*c[5]*x*x*x*x, EPS);
+    assert_epeq!(dc[2], 2.0*c[2] + 3.0*2.0*c[3]*x + 4.0*3.0*c[4]*x*x + 5.0*4.0*c[5]*x*x*x , EPS);
+    assert_epeq!(dc[3], 3.0*2.0*c[3] + 4.0*3.0*2.0*c[4]*x + 5.0*4.0*3.0*c[5]*x*x, EPS);
+    assert_epeq!(dc[4], 4.0*3.0*2.0*c[4] + 5.0*4.0*3.0*2.0*c[5]*x, EPS);
+    assert_epeq!(dc[5], 5.0*4.0*3.0*2.0*c[5], EPS);
 }
-*/
