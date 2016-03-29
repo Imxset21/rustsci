@@ -443,7 +443,7 @@ pub fn bessel_y0r(x: f64) -> (f64, f64)
 /// Irregular Bessel function Y_1(x)
 /// x > 0.0
 /// exceptions: GSL_EDOM, GSL_EOVRFLW, GSL_EUNDRFLW
-pub fn gslbessel_y1r(x: f64) -> (f64, f64)
+pub fn bessel_y1r(x: f64) -> (f64, f64)
 {
     if x <= 0.0
     {
@@ -462,7 +462,7 @@ pub fn gslbessel_y1r(x: f64) -> (f64, f64)
 /// Irregular Bessel function Y_n(x)
 /// x > 0.0
 /// exceptions: GSL_EDOM, GSL_EOVRFLW, GSL_EUNDRFLW
-pub fn gslbessel_ynr(n: i32, x: f64) -> (f64, f64)
+pub fn bessel_ynr(n: i32, x: f64) -> (f64, f64)
 {
     if x <= 0.0
     {
