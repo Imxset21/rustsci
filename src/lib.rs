@@ -13,6 +13,7 @@ pub mod gsl_poly;
 pub mod gsl_sf;
 pub mod gsl_airy;
 pub mod gsl_bessel;
+pub mod gsl_coulomb;
 
 #[cfg(test)]
 mod test
